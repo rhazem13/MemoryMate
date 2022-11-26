@@ -1,5 +1,5 @@
 from models.db import db
-class Location(db.Model):
+class UserLocationModel(db.Model):
     __tablename__ = "locations"
     id = db.Column(db.Integer, primary_key = True)
     lat = db.Column(db.Float)
