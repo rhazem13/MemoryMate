@@ -4,4 +4,4 @@ class UserLocationModel(db.Model):
     id = db.Column(db.Integer, primary_key = True)
     lat = db.Column(db.Float)
     lang = db.Column(db.Float)
-    user_id = db.Column(db.Integer, ForeignKey("user.id"))
+    user_id = db.Column(db.Integer, db.ForeignKey("user.id"))
