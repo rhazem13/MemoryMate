@@ -5,7 +5,7 @@ from sqlalchemy.orm import relationship
 db = SQLAlchemy()
 
 
-class UserModel(db.Model):
+class Notifications(db.Model):
     __tablename__ = "notifications"
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.text)
