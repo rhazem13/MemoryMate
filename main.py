@@ -6,7 +6,7 @@ from models.userModel import UserModel
 from models.notificationModel import NotificationModel
 from models.userAgendaModel import UserAgenda
 from models.userLocationsModel import UserLocationModel
-
+from routes.userRoutes import UserRouter
 app = Flask(__name__)
 api = Api(app)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:Hazm1102001@localhost/testone'
@@ -18,7 +18,7 @@ with app.app_context():
     db.create_all()
     print('creating all tables')
     
-
+api.add_resource(UserRouter, "/user")
 
 if __name__ == "__main__":
     app.run(debug=True)
