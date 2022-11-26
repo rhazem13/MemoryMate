@@ -16,9 +16,13 @@ class UserModel(db.Model):
     email = db.Column(db.String(80), unique=True, nullable=False)
     age = db.Column(db.Integer)
     address = db.Column(db.String(100), nullable=False)
-    patient = db.Column(db.bool, nullable=False)
+    isPatient = db.Column(db.Boolean, nullable=False)
     created_at = db.Column(db.DateTime(timezone=True),
-                           server_default=func.now())
+                        server_default=func.now())
     bio = db.Column(db.Text)
     locations = relationship('Locations')
     notifications = relationship('notifications')
+    email = db.Column(db.String(255))
+    hashed_password = db.Column(db.String(100))
+    created_at = db.Column(db.DateTime(timezone=True),
+                        server_default=func.now())
