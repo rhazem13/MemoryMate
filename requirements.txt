@@ -1,5 +1,7 @@
- flask
+flask-restful
+flask-sqlalchemy
+flask
 Werkzeug==2.0.1
- flask-socketio==4.3.2
- # wheel should not be needed, but avoids pyyaml paho-mqtt bdist_wheel error
- wheel
+Flask-SocketIO==4.3.1
+python-engineio==3.13.2
+python-socketio==4.6.0
