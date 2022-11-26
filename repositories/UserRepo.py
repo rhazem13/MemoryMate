@@ -1,6 +1,6 @@
 from flask_restful import fields, marshal_with
 from models.db import db
-from models.userModel import UserModel  
+from models.user.userModel import UserModel  
 from sqlalchemy.orm import load_only
 
 
