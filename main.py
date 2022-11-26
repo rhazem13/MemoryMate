@@ -3,9 +3,9 @@ from flask import Flask, request
 from flask_restful import Api
 from models.db import db
 from models.userModel import UserModel
-from models.notificationModel import NotificationModel
-from models.userAgendaModel import UserAgenda
-from models.userLocationsModel import UserLocationModel
+#from models.notificationModel import NotificationModel
+#from models.userAgendaModel import UserAgenda
+#from models.userLocationsModel import UserLocationModel
 
 app = Flask(__name__)
 api = Api(app)
@@ -16,7 +16,8 @@ app.secret_key = 'secret string'
 db.init_app(app)
 with app.app_context():
     db.create_all()
-    db.session.commit()
+    print('creating all tables')
+    
 
 
 if __name__ == "__main__":
