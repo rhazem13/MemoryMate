@@ -5,7 +5,10 @@ from flask_restful import Api
 from flask_socketio import SocketIO
 from models.db import db
 from routes.userRoutes import UserRouter
-
+from models.notificationModel import NotificationModel
+from models.userAgendaModel import UserAgenda
+from models.userLocationsModel import UserLocationModel
+from routes.userRoutes import UserRouter
 app = Flask(__name__)
 api = Api(app)
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ['DB_URL']

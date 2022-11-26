@@ -9,10 +9,10 @@ class UserRouter(Resource):
         #get user data by id
         return "shaaf"
 
-    def patch(self, id):
+    def patch(self):
         #modify user data by id
         return 1
     
-    def delete(self,id):
+    def delete(self):
         #delete user by id
         return 1
