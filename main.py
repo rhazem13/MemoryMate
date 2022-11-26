@@ -3,9 +3,9 @@ from flask import Flask, request
 from flask_restful import Api
 from models.db import db
 from models.userModel import UserModel
-#from models.notificationModel import NotificationModel
-#from models.userAgendaModel import UserAgenda
-#from models.userLocationsModel import UserLocationModel
+from models.notificationModel import NotificationModel
+from models.userAgendaModel import UserAgenda
+from models.userLocationsModel import UserLocationModel
 
 app = Flask(__name__)
 api = Api(app)
