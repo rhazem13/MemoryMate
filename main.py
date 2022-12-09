@@ -2,15 +2,20 @@ from flask_sqlalchemy import SQLAlchemy
 from flask import Flask, request 
 from flask_restful import Api
 from flask_socketio import SocketIO
+import os
+from dotenv import load_dotenv
 from models.db import db
 from routes.userRoutes import UserRouter
 from models.notificationModel import NotificationModel
 from models.userAgendaModel import UserAgenda
 from models.userLocationsModel import UserLocationModel
 from routes.userRoutes import UserRouter
+load_dotenv()
+
 app = Flask(__name__)
 api = Api(app)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:Hazm1102001@localhost/testone'
+print (os.getenv('DB_URL'))
+app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DB_URL')
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = True
 app.secret_key = 'secret string'
 api.add_resource(UserRouter,'/')
