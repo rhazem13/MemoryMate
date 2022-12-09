@@ -10,6 +10,7 @@ from models.notificationModel import NotificationModel
 from models.userAgendaModel import UserAgenda
 from models.userLocationsModel import UserLocationModel
 from routes.userRoutes import UserRouter
+from flask_migrate import Migrate
 load_dotenv()
 
 app = Flask(__name__)
@@ -17,17 +18,19 @@ api = Api(app)
 print (os.getenv('DB_URL'))
 app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DB_URL')
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = True
+db = SQLAlchemy(app)
+migrate= Migrate(app,db)
 app.secret_key = 'secret string'
 api.add_resource(UserRouter,'/')
 socketio  = SocketIO(app, cors_allowed_origins='*')
-db.init_app(app)
-
+# db.init_app(app)
+# migrate = Migrate()
 @socketio.on('connect')
 def test_connect():
     print('sharaf')
     socketio.emit('after connect', {'data':'Let us learn Web Socket in Flask'})
-#with app.app_context():
-#    db.create_all()
+with app.app_context():
+    db.create_all()
 
 #if __name__ == "main":
 #app.run(debug = True)
