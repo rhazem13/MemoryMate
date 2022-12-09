@@ -6,7 +6,7 @@ from sqlalchemy.sql import func
 db = SQLAlchemy()
 
 
-class Notifications(db.Model):
+class NotificationModel(db.Model):
     __tablename__ = "notifications"
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.Text)
