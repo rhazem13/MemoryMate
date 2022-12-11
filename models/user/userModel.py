@@ -21,3 +21,6 @@ class User(db.Model):
     hashed_password = db.Column(db.String(100))
     created_at = db.Column(db.DateTime(timezone=True),
                         server_default=func.now())
+    #//    public_id = db.Column(db.String(50), unique=True)
+    #//     admin = db.Column(db.Boolean)
+
