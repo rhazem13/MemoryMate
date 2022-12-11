@@ -1,7 +1,8 @@
-from models.db import db
+from models.db import db,Base
 
 
-class UserAgenda (db.Model):
+
+class UserAgenda (db.Model,Base):
     __tablename__ = "agenda"
     id = db.Column(db.Integer, primary_key=True)
     date= db.Column(db.DateTime(timezone=True))
