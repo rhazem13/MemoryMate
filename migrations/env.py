@@ -1,11 +1,10 @@
 from __future__ import with_statement
 
-
 import logging
 from logging.config import fileConfig
-from models.db import Base
 
 from flask import current_app
+
 from alembic import context
 
 # this is the Alembic Config object, which provides
@@ -18,8 +17,6 @@ fileConfig(config.config_file_name)
 logger = logging.getLogger('alembic.env')
 
 # add your model's MetaData object here
-
-target_metadata=Base.metadata
 # for 'autogenerate' support
 # from myapp import mymodel
 # target_metadata = mymodel.Base.metadata
