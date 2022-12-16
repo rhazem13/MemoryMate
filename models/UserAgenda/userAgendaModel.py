@@ -2,7 +2,7 @@ from models.db import db,Base
 
 
 
-class userAgenda (db.Model,Base):
+class UserAgenda (db.Model,Base):
     __tablename__ = "user_agenda"
     id = db.Column(db.Integer, primary_key=True)
     date_time= db.Column(db.DateTime(timezone=True))

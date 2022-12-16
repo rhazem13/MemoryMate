@@ -1,6 +1,6 @@
 from models.db import db,Base
 
-class userfacesModel(db.Model,Base):
+class UserfacesModel(db.Model,Base):
     __tablename__="userfaces"
     user_id = db.Column(db.Integer,)
     face_id = db.Column(db.Integer)
