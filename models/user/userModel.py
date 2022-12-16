@@ -3,6 +3,8 @@ from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 from models.user.userTypeEnum import EUserType
 from models.db import db
+from models.UserLocations import userLocationsModel
+from models.Notifications import notificationsModel
 class User(db.Model):
     __tablename__ = "user"
     id = db.Column(db.Integer, primary_key=True)
@@ -19,5 +21,5 @@ class User(db.Model):
     created_at = db.Column(db.DateTime(timezone=True),
                         server_default=func.now())
     locations = relationship('UserLocationModel')
-    notifications = relationship('NotificationModel')
+    notifications = relationship('NotificationsModel')
 
