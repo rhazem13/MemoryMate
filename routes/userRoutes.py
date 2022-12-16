@@ -27,9 +27,8 @@ def get():
 @user_bp.post('/register')
 def register():
     payload =request.get_json()['user']
-    hashed_password = generate_password_hash(payload['hashed_password'], 10)
-    payload['hashed_password'] = hashed_password
-    print(len(hashed_password))
+    hashed_password = generate_password_hash(payload['password'], 10)
+    payload['password'] = hashed_password
     user = UserRepo.create(payload)
     token = jwt.encode({'id' : user.id, 'exp' : datetime.datetime.utcnow() + datetime.timedelta(minutes=30)},'secret')
     return {'token': token}
@@ -41,7 +40,7 @@ def login():
     if  user is None:
         return Response(status = 404)
     password = user.hashed_password
-    if password == payload['hashed_password']:
+    if password == payload['password']:
         return Response(json.dumps({'message':'success'}), status = 200, mimetype='application/json')
     return Response(status=403)
 
