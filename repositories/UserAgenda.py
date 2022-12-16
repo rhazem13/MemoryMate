@@ -1,6 +1,6 @@
 from flask_restful import fields, marshal_with
 from models.db import db
-from models.userAgendaModel import UserAgenda
+from models.userAgenda.userAgendaModel import UserAgenda
 
 resource_fields = {
     'id': fields.Integer,

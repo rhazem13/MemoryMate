@@ -3,24 +3,21 @@ from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 from models.user.userTypeEnum import EUserType
 from models.db import db
-class User(db.Model):
+class user(db.Model):
     __tablename__ = "user"
     id = db.Column(db.Integer, primary_key=True)
+    username = db.Column(db.String(20), unique=True, nullable=False)
     firstname = db.Column(db.String(100), nullable=False)
     lastname = db.Column(db.String(100), nullable=False)
     email = db.Column(db.String(80), unique=True, nullable=False)
-   # date_of_birth = db.Column(db.Date, nullable=True)
+    password = db.Column(db.String(100))
+    photo_path = db.Column(db.text)
+    user_type = db.Column(db.Enum(EUserType), nullable=False)
     address = db.Column(db.String(100), nullable=False)
-    type = db.Column(db.Enum(EUserType), nullable=False)
+    phone = db.Column(db.String(20), nullable=False)
+    date_of_birth = db.Column(db.Date, nullable=True)
     created_at = db.Column(db.DateTime(timezone=True),
                         server_default=func.now())
-    bio = db.Column(db.Text)
     locations = relationship('UserLocationModel')
     notifications = relationship('NotificationModel')
-    email = db.Column(db.String(255))
-    hashed_password = db.Column(db.String(100))
-    created_at = db.Column(db.DateTime(timezone=True),
-                        server_default=func.now())
-    #//    public_id = db.Column(db.String(50), unique=True)
-    #//     admin = db.Column(db.Boolean)
 
