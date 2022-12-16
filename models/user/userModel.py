@@ -9,14 +9,14 @@ class User(db.Model):
     firstname = db.Column(db.String(100), nullable=False)
     lastname = db.Column(db.String(100), nullable=False)
     email = db.Column(db.String(80), unique=True, nullable=False)
-    age = db.Column(db.Integer)
+   # date_of_birth = db.Column(db.Date, nullable=True)
     address = db.Column(db.String(100), nullable=False)
     type = db.Column(db.Enum(EUserType), nullable=False)
     created_at = db.Column(db.DateTime(timezone=True),
                         server_default=func.now())
     bio = db.Column(db.Text)
-    locations = relationship('Locations')
-    notifications = relationship('notifications')
+    locations = relationship('UserLocationModel')
+    notifications = relationship('NotificationModel')
     email = db.Column(db.String(255))
     hashed_password = db.Column(db.String(100))
     created_at = db.Column(db.DateTime(timezone=True),
