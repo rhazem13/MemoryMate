@@ -22,3 +22,6 @@ def create(user):
 def get_by_id(id):
     result = UserAgenda.query.get(id)
     return result
+
+def delete_location(id):
+    
