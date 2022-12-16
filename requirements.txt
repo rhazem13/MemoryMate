@@ -1,5 +1,5 @@
 flask-restful
-flask-sqlalchemy
+flask-sqlalchemy==2.5.1
 flask
 Werkzeug==2.0.1
 Flask-SocketIO==4.3.1
