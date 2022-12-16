@@ -4,7 +4,7 @@ from flask_restful import Resource, reqparse, abort
 from repositories import UserRepo
 from models.user import userModel
 from models.db import db
-
+from middlewares.auth import token_required
 import uuid
 from werkzeug.security import generate_password_hash, check_password_hash
 import jwt
