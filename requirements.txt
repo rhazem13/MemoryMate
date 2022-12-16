@@ -1,5 +1,5 @@
 flask-restful
-flask-sqlalchemy
+flask-sqlalchemy==2.5.1
 flask
 Werkzeug==2.0.1
 Flask-SocketIO==4.3.1
@@ -8,3 +8,5 @@ python-socketio==4.6.0
 flask-migrate==4.0.0
 python-dotenv==0.21.0
 marshmallow==3.19.0
+flask_caching==2.0.1
+redis==4.4.0
