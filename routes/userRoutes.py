@@ -28,7 +28,8 @@ def get():
 def register():
     payload =request.get_json()['user']
     hashed_password = generate_password_hash(payload['hashed_password'], 10)
-    payload['hashed_password'] = "123456"
+    payload['hashed_password'] = hashed_password
+    print(len(hashed_password))
     user = UserRepo.create(payload)
     token = jwt.encode({'id' : user.id, 'exp' : datetime.datetime.utcnow() + datetime.timedelta(minutes=30)},'secret')
     return {'token': token}
@@ -44,7 +45,9 @@ def login():
         return Response(json.dumps({'message':'success'}), status = 200, mimetype='application/json')
     return Response(status=403)
 
+#@user_bp.get("/me") / it returns the information of the current user based on the token
 
-def delete(self):
-    #delete user by id
-    return 1
+#@user_bp.get('/locations') it returns the locations of the current user
+
+#@user_bp.post('/locations') it adds a location for a user
+#@user_bp.put('/locations/{location_id}') it updates a location by it's id
