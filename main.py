@@ -5,9 +5,6 @@ from flask_socketio import SocketIO
 import os
 from dotenv import load_dotenv
 from models.db import db
-from models.Notifications.notificationsModel import NotificationModel
-from models.userAgenda.userAgendaModel import UserAgenda
-from models.userLocations.userLocationsModel import UserLocationModel
 from routes.userRoutes import user_bp
 from flask_migrate import Migrate
 

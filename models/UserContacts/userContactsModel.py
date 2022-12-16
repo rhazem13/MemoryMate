@@ -1,6 +1,6 @@
 from models.db import db
 from models.UserContacts.relationLevelEnum import ERelationLevel
-class userContacts(db.Model):
+class UserContacts(db.Model):
     __tablename__ = "user_contacts"
     user_id = db.Column(db.Integer, primary_key=True)
     contact_id=db.Column(db.Integer, primary_key=True)
