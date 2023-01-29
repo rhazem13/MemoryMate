@@ -1,7 +1,7 @@
 from flask import Flask, request, Blueprint
 from flask_restful import Resource, reqparse, abort
 from flask_bcrypt import generate_password_hash
-from models.user.userModel import User
+from models.User.userModel import User
 from repositories import UserRepo
 import jwt
 import datetime
