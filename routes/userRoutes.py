@@ -7,12 +7,21 @@ import jwt
 import datetime
 from flask import Response
 import json
-import bcrypt
-import flask_bcrypt
+import random
+from services.caching.caching import CacheService
 user_bp = Blueprint('users', __name__)
 
-""" user_put_args = reqparse.RequestParser()
-
+class UserRouters:
+    user_bp = Blueprint('users', __name__)
+    cache = CacheService.get_instance()
+    @user_bp.get('/hello')
+    @cache.get_cache(key_prefix='test_deco')
+    def get():
+        #get user data by id
+        n = random.randint(0,10000)
+        print('holaaaaaaaaaaaaaaaaaaaaaaaaaa')
+        return str(n)
+"""
 user_put_args.add_argument("username", type=str, help="email")
 user_put_args.add_argument("password", type=str, help="password")
 user_put_args.add_argument("password", type=str, help="firstname")
@@ -54,9 +63,9 @@ def login():
     #     return Response(json.dumps({'message':'success'}), status = 200, mimetype='application/json')
     # return Response(status=403)
 
-#@user_bp.get("/me") / it returns the information of the current user based on the token
+    #@user_bp.get("/me") / it returns the information of the current user based on the token
 
-#@user_bp.get('/locations') it returns the locations of the current user
+    #@user_bp.get('/locations') it returns the locations of the current user
 
-#@user_bp.post('/locations') it adds a location for a user
-#@user_bp.put('/locations/{location_id}') it updates a location by it's id
+    #@user_bp.post('/locations') it adds a location for a user
+    #@user_bp.put('/locations/{location_id}') it updates a location by it's id
