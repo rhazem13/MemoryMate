@@ -8,6 +8,9 @@ from services.caching.caching import CacheService
 import os
 from dotenv import load_dotenv
 from models.db import db
+from routes.userRoutes import user_bp
+from flask_migrate import Migrate
+from flask_marshmallow import Marshmallow
 
 
 load_dotenv()
@@ -17,6 +20,7 @@ api = Api(app)
 app.config.from_object('config.Config')  # Set the configuration variables to the flask application
 migrate= Migrate(app,db)
 migrate.init_app(app, db)
+ma = Marshmallow(app)
 socketio  = SocketIO(app, cors_allowed_origins='*')
 db.init_app(app)
 CacheService.initialize(app)
@@ -28,6 +32,7 @@ app.register_blueprint(userRouter.user_bp, url_prefix='/users')
 def test_connect():
     print('sharaf')
     socketio.emit('after connect', {'data':'Let us learn Web Socket in Flask'})
+
 # with app.app_context():
 #     db.create_all()
 
