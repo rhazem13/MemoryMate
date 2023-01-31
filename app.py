@@ -21,10 +21,7 @@ load_dotenv()
 app = Flask(__name__)
 api = Api(app)
 app.config.from_object('config.Config')  # Set the configuration variables to the flask application
-app.register_blueprint(user_bp, url_prefix='/users')
-app.register_blueprint(user_location_bp, url_prefix='/userlocation')
-app.register_blueprint(user_agenda_bp, url_prefix='/useragenda')
-app.register_blueprint(user_calendar_bp, url_prefix='/usercalendar')
+
 migrate= Migrate(app,db)
 migrate.init_app(app, db)
 ma = Marshmallow(app)
@@ -34,6 +31,9 @@ CacheService.initialize(app)
 from routes.userRoutes import UserRouters
 userRouter =  UserRouters()
 app.register_blueprint(userRouter.user_bp, url_prefix='/users')
+app.register_blueprint(user_location_bp, url_prefix='/userlocation')
+app.register_blueprint(user_agenda_bp, url_prefix='/useragenda')
+app.register_blueprint(user_calendar_bp, url_prefix='/usercalendar')
 
 @socketio.on('connect')
 def test_connect():
