@@ -15,12 +15,19 @@ class UserRouters:
     user_bp = Blueprint('users', __name__)
     cache = CacheService.get_instance()
     @user_bp.get('/hello')
-    @cache.cached(key_prefix='sharaf')
+    @cache.get_cache(key_prefix='test_deco')
     def get():
         #get user data by id
         n = random.randint(0,10000)
         print('holaaaaaaaaaaaaaaaaaaaaaaaaaa')
         return str(n)
+
+    @user_bp.get('/hello_update')
+    @cache.update_cache(key_prefix='test_deco')
+    def test_cache_update():
+        n = random.randint(0,10000)
+        print('holaaaaaaaaaaaaaaaaaaaaaaaaaa')
+        return str(n) 
 
     @user_bp.post('/register')
     def register():
