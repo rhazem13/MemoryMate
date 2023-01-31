@@ -4,7 +4,7 @@ from flask_restful import Api
 from flask_socketio import SocketIO
 from flask_migrate import Migrate
 from flask_caching import Cache
-from services.caching import CacheService
+from services.caching.caching import CacheService
 import os
 from dotenv import load_dotenv
 from models.db import db
@@ -34,8 +34,5 @@ def test_connect():
 #if __name__ == "main":
 
 app.run(debug = True)
-
-
-    
 #socketio.run(app, debug = True)
 

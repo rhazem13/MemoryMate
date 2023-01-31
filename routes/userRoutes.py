@@ -8,7 +8,7 @@ import datetime
 from flask import Response
 import json
 import random
-from services.caching import CacheService
+from services.caching.caching import CacheService
 from flask_caching import Cache
 
 class UserRouters:
