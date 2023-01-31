@@ -1,6 +1,15 @@
 from flask_restful import fields, marshal_with
 from models.db import db
 from models.user.userModel import User  
+#comment by hazem =>
+#we import some models as if we don't import them they won't be noticed in the migrations
+#To do : change this to db file and export them
+from models.Faces.facesModel import FacesModel
+from models.UserAgenda.userAgendaModel import UserAgenda
+from models.UserCalendar.userCalendarModel import UserCalendarModel
+from models.UserContacts.userContactsModel import UserContacts
+from models.UserFaces.userfacesModel import UserfacesModel
+
 from sqlalchemy.orm import load_only
 
 class UserRepo():
