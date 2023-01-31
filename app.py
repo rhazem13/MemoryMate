@@ -7,6 +7,8 @@ from dotenv import load_dotenv
 from models.db import db
 from routes.userRoutes import user_bp
 from flask_migrate import Migrate
+from flask_marshmallow import Marshmallow
+
 
 load_dotenv()
 
@@ -16,6 +18,7 @@ app.config.from_object('config.Config')  # Set the configuration variables to th
 app.register_blueprint(user_bp, url_prefix='/users')
 migrate= Migrate(app,db)
 migrate.init_app(app, db)
+ma = Marshmallow(app)
 
 socketio  = SocketIO(app, cors_allowed_origins='*')
 db.init_app(app)
@@ -23,6 +26,7 @@ db.init_app(app)
 def test_connect():
     print('sharaf')
     socketio.emit('after connect', {'data':'Let us learn Web Socket in Flask'})
+
 # with app.app_context():
 #     db.create_all()
 
