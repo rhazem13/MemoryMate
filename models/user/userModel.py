@@ -1,7 +1,7 @@
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
-from models.user.userTypeEnum import EUserType
+from models.User.userTypeEnum import EUserType
 from models.db import db
 from models.UserLocations import userLocationsModel
 from models.Notifications import notificationsModel
@@ -22,7 +22,6 @@ class User(db.Model):
     date_of_birth = db.Column(db.Date, nullable=True)
     created_at = db.Column(db.DateTime(timezone=True),
                         server_default=func.now())
-    hashed_password= db.Column(db.String(128))                 
     locations = relationship('UserLocationModel')
     notifications = relationship('NotificationsModel')
 
