@@ -1,42 +1,41 @@
-from flask import Flask, request, Blueprint
-from flask_restful import Resource, reqparse, abort
-from flask_bcrypt import generate_password_hash
-from models.UserLocations.userLocationsModel import UserLocationModel
+from flask import request, Blueprint
+from flask_restful import abort
 from repositories import locationRepository
-import jwt
-import datetime
-from flask import Response
-import json
-
-
-user_put_args = reqparse.RequestParser()
-user_put_args.add_argument("id", type=int, help="id")
-user_put_args.add_argument("lat", type=float, help="lat")
-user_put_args.add_argument("long", type=float, help="long")
-user_put_args.add_argument("user_id", type=int, help="user_id")
-user_put_args.add_argument("location_name", type=str, help="location_name")
-user_put_args.add_argument("additional_info", type=str, help="additional_info")
-
-
+from middlewares.validation.userLocationValidation import UserLocationSchema
 user_location_bp = Blueprint('userlocation', __name__)
-
-@user_location_bp.get('')
-def get():
-    return locationRepository.get_all()
-
-
-
+manySchema=UserLocationSchema(many=True)
+singleSchema=UserLocationSchema()
 
 @user_location_bp.post('')
 def post():
-    payload =request.get_json()
-    return locationRepository.create(payload)
+    
+    errors= singleSchema.validate(request.get_json())
+    if errors:
+        return errors, 422
+    payload =UserLocationSchema().load(request.json)
+    if('id' in payload):
+        return "Id field shouldn't be entered",422
+    return singleSchema.dump(locationRepository.create(payload))
 
-@user_location_bp.patch('')
-def patch():
-    payload =request.get_json()
-    return locationRepository.update(payload)
+@user_location_bp.get('')
+def get():
+    result= locationRepository.get_all()
+    return manySchema.dump(result)
+
+@user_location_bp.patch('/<int:id>')
+def patch(id):
+    errors= singleSchema.validate(request.get_json(),partial=True)
+    if errors:
+        return errors, 422
+    payload =UserLocationSchema().load(request.get_json(),partial=True)
+    result=locationRepository.update(payload,id)
+    if not result:
+        return "Location Id doesn't exist",404
+    return singleSchema.dump(result)
 
 @user_location_bp.delete('/<int:id>')
 def delete(id):
-    return locationRepository.delete(id)
+    result = locationRepository.delete(id)
+    if(result):
+        return {"deleted":f"{id}"}
+    abort(404)
