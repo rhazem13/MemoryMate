@@ -5,7 +5,6 @@ from models.user.userTypeEnum import EUserType
 from models.db import db
 from models.UserLocations import userLocationsModel
 from models.Notifications import notificationsModel
-from flask_marshmallow import Marshmallow
 
 class User(db.Model):
     __tablename__ = "user"
@@ -16,15 +15,17 @@ class User(db.Model):
     email = db.Column(db.String(80), unique=True, nullable=False)
     password = db.Column(db.String(128))
     photo_path = db.Column(db.Text())
-    user_type = db.Column(db.Enum(EUserType), nullable=False)
+    user_type = db.Column(db.String(20), nullable=False)
     address = db.Column(db.String(100), nullable=False)
     phone = db.Column(db.String(20), nullable=False)
     date_of_birth = db.Column(db.Date, nullable=True)
     created_at = db.Column(db.DateTime(timezone=True),
                         server_default=func.now())
-    hashed_password= db.Column(db.String(128))                 
     locations = relationship('UserLocationModel')
     notifications = relationship('NotificationsModel')
+
+
+
 
 
 
