@@ -1,11 +1,11 @@
 from flask import request, Blueprint
 from flask_restful import  abort
-from repositories import calendarRepository
+from repositories.calendarRepository import CalendarRepository
 from middlewares.validation.userCalendarValidation import UserCalendarSchema
 user_calendar_bp = Blueprint('usercalendar', __name__)
 manySchema=UserCalendarSchema(many=True)
 singleSchema=UserCalendarSchema()
-
+calendarRepository = CalendarRepository()
 @user_calendar_bp.post('')
 def post():
     errors= UserCalendarSchema().validate(request.get_json())

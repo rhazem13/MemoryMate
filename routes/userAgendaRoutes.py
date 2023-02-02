@@ -1,11 +1,11 @@
 from flask import request, Blueprint
 from flask_restful import abort
-from repositories import agendaRepository
+from repositories.agendaRepository import AgendaRepository
 from middlewares.validation.userAgendaValidation import UserAgendaSchema
 user_agenda_bp = Blueprint('useragenda', __name__)
 manySchema=UserAgendaSchema(many=True)
 singleSchema=UserAgendaSchema()
-
+agendaRepository = AgendaRepository()
 @user_agenda_bp.post('')
 def post():
     errors= UserAgendaSchema().validate(request.get_json())
