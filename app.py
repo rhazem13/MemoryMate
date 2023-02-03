@@ -25,7 +25,6 @@ app.config.from_object('config.Config')  # Set the configuration variables to th
 migrate= Migrate(app,db)
 migrate.init_app(app, db)
 ma = Marshmallow(app)
-socketio  = SocketIO(app, cors_allowed_origins='*')
 db.init_app(app)
 CacheService.initialize(app)
 from routes.userRoutes import UserRouters
@@ -34,6 +33,7 @@ app.register_blueprint(userRouter.user_bp, url_prefix='/users')
 app.register_blueprint(user_location_bp, url_prefix='/userlocation')
 app.register_blueprint(user_agenda_bp, url_prefix='/useragenda')
 app.register_blueprint(user_calendar_bp, url_prefix='/usercalendar')
+socketio  = SocketIO(app, cors_allowed_origins='*')
 
 @socketio.on('connect')
 def test_connect():
@@ -43,8 +43,9 @@ def test_connect():
 # with app.app_context():
 #     db.create_all()
 
-#if __name__ == "main":
+if __name__ == "main":
 
-app.run(debug = True)
-#socketio.run(app, debug = True)
+    #app.run(debug = True)
+    print('starting socket')
+    socketio.run(app, debug = True, host='127.0.0.1')
 
