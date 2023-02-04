@@ -3,6 +3,7 @@ from flask_restful import Resource, reqparse, abort
 from flask_bcrypt import generate_password_hash,check_password_hash
 from models.user.userModel import User
 from validation.UserValidation import CreateUserscheme,LoginUserscheme
+from middlewares.auth import *
 from repositories.UserRepo import UserRepo
 import jwt
 import datetime
@@ -11,7 +12,9 @@ from marshmallow import  ValidationError
 import os
 from werkzeug.utils import secure_filename
 
+
 user_bp = Blueprint('users', __name__)
+UPLOAD_FOLDER = 'static\image'
 
 """ user_put_args = reqparse.RequestParser()
 
@@ -25,15 +28,11 @@ user_put_args.add_argument("password", type=str, help="type")
  """
 
 
-   
 
-
-
-
-@user_bp.get('/hello')
+@user_bp.get('/auth')
+@token_required
 def get():
-    #get user data by id
-    return "alaaaaa"
+    return {'message': 'authinticated successfully'}
 
 
 
@@ -47,13 +46,12 @@ def register():
     payload =request.get_json()['user']
     create_user_schema = CreateUserscheme()
     hashed_password = generate_password_hash(payload['password']).decode('utf-8')
-    payload['password'] = hashed_password
-
     errors = create_user_schema.validate(payload)
-
     if errors:
         return errors,422
+
     try:
+     payload['password'] = hashed_password
      user = UserRepo.create(payload)
      return {'message': 'registered successfully'}
     
@@ -61,7 +59,6 @@ def register():
     # print the error
      print(err.messages) 
 
-UPLOAD_FOLDER = 'static\image'
 @user_bp.post('/imageupload')
 def test():
     file = request.files['file']
@@ -69,10 +66,14 @@ def test():
     file.save(os.path.join(UPLOAD_FOLDER, filename))
     return {'message': 'registered successfully'}
 
-    
+# @user_bp.get('/protected')
+# @token_required
+# def get():
+#         return "protected"
 
-    
-
+# @user_bp.get('/unprotected')
+# def get():
+#         return "unprotected"
 
 
 
@@ -92,7 +93,7 @@ def login():
     if check_password_hash( user.password,payload['password']):
         try:
          token = jwt.encode({'id' : user.id, 'exp' : datetime.datetime.utcnow() + datetime.timedelta(minutes=30)},'secret') 
-         return {'token': token}
+         return jsonify({'token' : token})
         except ValidationError as err:
             print(err.messages)
 

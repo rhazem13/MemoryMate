@@ -1,6 +1,6 @@
 from flask_restful import fields, marshal_with
 from models.db import db
-from models.userAgenda.userAgendaModel import UserAgenda
+from models.UserAgenda.userAgendaModel import UserAgenda
 
 resource_fields = {
     'id': fields.Integer,
@@ -23,5 +23,4 @@ def get_by_id(id):
     result = UserAgenda.query.get(id)
     return result
 
-def delete_location(id):
-    
+#def delete_location(id)
