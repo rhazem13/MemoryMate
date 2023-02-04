@@ -22,7 +22,7 @@ class CreateUserscheme(Schema):
     user_type=fields.Str(required=True,validate=OneOf(user_types))
     address=fields.Str(required=True,validate=Length(min=3))
     phone = fields.Str(validate=Regexp(phone_regex))
-    date_of_birth=fields.Date(required=True)
+    date_of_birth=fields.Date(required=True) #yyyy-mm-dd"
     @validates('created_at')
     def is_notborn_in_future(value):
         """'value' is the datetime parsed from time_created by marshmallow"""
