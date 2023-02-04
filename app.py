@@ -9,6 +9,10 @@ from models.db import db
 from routes.userLocationRoutes import user_location_bp
 from routes.userAgendaRoutes import user_agenda_bp
 from routes.userCalendarRoutes import user_calendar_bp
+from routes.facesRoutes import face_bp
+from routes.notificationRoutes import notification_bp
+from routes.userContactsRoutes import user_contacts_bp
+from routes.userFacesRoutes import user_face_bp
 from flask_migrate import Migrate
 from flask_marshmallow import Marshmallow
 from services.EventEmitter.event_emitter import EventEmitter
@@ -31,6 +35,10 @@ app.register_blueprint(userRouter.user_bp, url_prefix='/users')
 app.register_blueprint(user_location_bp, url_prefix='/userlocation')
 app.register_blueprint(user_agenda_bp, url_prefix='/useragenda')
 app.register_blueprint(user_calendar_bp, url_prefix='/usercalendar')
+app.register_blueprint(face_bp, url_prefix='/faces')
+app.register_blueprint(notification_bp, url_prefix='/notifications')
+app.register_blueprint(user_contacts_bp, url_prefix='/usercontacts')
+app.register_blueprint(user_face_bp, url_prefix='/userfaces')
 socketio  = SocketIO(app, cors_allowed_origins='*')
 emitter = EventEmitter.getInstance()
 def test_event(keyword, name):

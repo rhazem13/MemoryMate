@@ -1,38 +1,36 @@
-from flask import Flask, request, Blueprint
-from flask_restful import Resource, reqparse, abort
-from flask_bcrypt import generate_password_hash
-from models.UserCalendar.userCalendarModel import UserCalendarModel
-from repositories import calendarRepository
-import jwt
-import datetime
-from flask import Response
-import json
-
-user_put_args = reqparse.RequestParser()
-user_put_args.add_argument("id", type=int, help="id")
-user_put_args.add_argument("date", type=datetime, help="date_time")
-user_put_args.add_argument("title", type=str, help="title")
-user_put_args.add_argument("user_id", type=int, help="user_id")
-user_put_args.add_argument("additional_info", type=str, help="additional_info")
-
+from flask import request, Blueprint
+from flask_restful import  abort
+from repositories.calendarRepository import CalendarRepository
+from middlewares.validation.userCalendarValidation import UserCalendarSchema
 user_calendar_bp = Blueprint('usercalendar', __name__)
+manySchema=UserCalendarSchema(many=True)
+singleSchema=UserCalendarSchema()
+calendarRepository = CalendarRepository()
+@user_calendar_bp.post('')
+def post():
+    errors= UserCalendarSchema().validate(request.get_json())
+    if errors:
+        return errors, 422
+    payload =UserCalendarSchema().load(request.json)
+    if('id' in payload):
+        return "Id field shouldn't be entered",422
+    return singleSchema.dump(calendarRepository.create(payload))
 
 @user_calendar_bp.get('')
 def get():
-    return calendarRepository.get_all()
+    calendarList= calendarRepository.get_all()
+    return manySchema.dump(calendarList)
 
-
-
-
-@user_calendar_bp.post('')
-def post():
-    payload =request.get_json()
-    return calendarRepository.create(payload)
-
-@user_calendar_bp.patch('')
-def patch():
-    payload =request.get_json()
-    return calendarRepository.update(payload)
+@user_calendar_bp.patch('/<int:id>')
+def patch(id):
+    errors= UserCalendarSchema().validate(request.get_json(),partial=True)
+    if errors:
+        return errors, 422
+    payload =UserCalendarSchema().load(request.json,partial=True)
+    result = calendarRepository.update(payload,id)
+    if not result:
+        return "Calendar id not found",404
+    return singleSchema.dump(result)
 
 @user_calendar_bp.delete('/<int:id>')
 def delete(id):
