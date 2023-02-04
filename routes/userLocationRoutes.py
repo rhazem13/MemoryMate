@@ -1,11 +1,11 @@
 from flask import request, Blueprint
 from flask_restful import abort
-from repositories import locationRepository
+from repositories.locationRepository import LocationRepository
 from middlewares.validation.userLocationValidation import UserLocationSchema
 user_location_bp = Blueprint('userlocation', __name__)
 manySchema=UserLocationSchema(many=True)
 singleSchema=UserLocationSchema()
-
+locationRepository= LocationRepository()
 @user_location_bp.post('')
 def post():
     
