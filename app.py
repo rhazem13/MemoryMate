@@ -13,6 +13,7 @@ from routes.facesRoutes import face_bp
 from routes.notificationRoutes import notification_bp
 from routes.userContactsRoutes import user_contacts_bp
 from routes.userFacesRoutes import user_face_bp
+from routes.eventsRoutes import events_bp
 from flask_migrate import Migrate
 from flask_marshmallow import Marshmallow
 from services.EventEmitter.event_emitter import EventEmitter
@@ -39,6 +40,7 @@ app.register_blueprint(face_bp, url_prefix='/faces')
 app.register_blueprint(notification_bp, url_prefix='/notifications')
 app.register_blueprint(user_contacts_bp, url_prefix='/usercontacts')
 app.register_blueprint(user_face_bp, url_prefix='/userfaces')
+app.register_blueprint(events_bp, url_prefix='/events')
 socketio  = SocketIO(app, cors_allowed_origins='*')
 emitter = EventEmitter.getInstance()
 def test_event(keyword, name):
@@ -51,6 +53,11 @@ def test_connect():
     emitter.on('an-event', test_event)
     socketio.emit('after connect', {'data':'Let us learn Web Socket in Flask'})
 
+##testing emitter,, hazem
+def update_location():
+    print("send new location ")
+emitter.on('update-location',update_location())
+################################
 # with app.app_context():
 #     db.create_all()
 
