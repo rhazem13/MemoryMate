@@ -7,3 +7,4 @@ class UserLocationModel(db.Model,Base):
     long = db.Column(db.Float)
     user_id = db.Column(db.Integer, db.ForeignKey("user.id"))
     location_name=db.Column(db.String)
+    additional_info = db.Column(db.Text)
