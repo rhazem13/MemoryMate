@@ -1,6 +1,8 @@
 from flask_sqlalchemy import SQLAlchemy
+from flask_marshmallow import Marshmallow
+from marshmallow import Schema, fields, post_load
 db = SQLAlchemy()
-
+ma = Marshmallow()
 """ from models.user.userModel import User
 from UserAgenda.userAgendaModel import UserAgenda
 from UserCalendar.userCalendarModel import UserCalendarModel

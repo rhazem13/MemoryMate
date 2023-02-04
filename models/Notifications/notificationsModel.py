@@ -15,5 +15,5 @@ class NotificationsModel(db.Model,Base):
     body =  db.Column(JSONB)
     created_at = db.Column(db.DateTime(timezone=True),
                         server_default=func.now())
-    type = db.String(100)
+    type = db.Column(db.String(100))
     
