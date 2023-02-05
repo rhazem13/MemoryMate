@@ -14,3 +14,5 @@ class UserAgendaSchema(Schema):
         user=UserRepo.get_by_id(user_id)
         if(user==None):
             raise ValidationError("User Id Does Not Exist!")
+        if(user.user_type!='PATIENT'):
+            raise ValidationError("User Type Must Be Patient!")
