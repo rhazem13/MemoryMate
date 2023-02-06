@@ -6,8 +6,8 @@ class Event:
         self.emitter = EventEmitter.getInstance()
         self.repo = NotificationsRepository()
     
-    def notify(self, sender_id, reciever_id):
-        data = self.getData(sender_id, reciever_id)
+    def notify(self, sender_id, reciever_id, args=None):
+        data = self.getData(sender_id, reciever_id, args)
         self.store(data)
         self.emit(data)
 
@@ -17,5 +17,5 @@ class Event:
     def store(self, data):
         self.repo.create(data)
     
-    def getData(self, sender_id, reciever_id):
+    def getData(self, sender_id, reciever_id, args=None):
         raise NotImplementedError("getData function not implemented")
