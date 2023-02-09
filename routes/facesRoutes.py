@@ -2,11 +2,14 @@ from flask import request, Blueprint
 from flask_restful import abort
 from repositories.facesRepository import FacesRepository
 from middlewares.validation.facesValidation import FacesSchema
+from middlewares.auth import token_required
+
 face_bp = Blueprint('faces', __name__)
 manySchema=FacesSchema(many=True)
 singleSchema=FacesSchema()
 faceRepository= FacesRepository()
 @face_bp.post('')
+@token_required
 def post():
     errors= singleSchema.validate(request.get_json())
     if errors:
@@ -17,11 +20,13 @@ def post():
     return singleSchema.dump(faceRepository.create(payload))
 
 @face_bp.get('')
+@token_required
 def get():
     result= faceRepository.get_all()
     return manySchema.dump(result)
 
 @face_bp.patch('/<int:id>')
+@token_required
 def patch(id):
     errors= singleSchema.validate(request.get_json(),partial=True)
     if errors:
@@ -33,6 +38,7 @@ def patch(id):
     return singleSchema.dump(result)
 
 @face_bp.delete('/<int:id>')
+@token_required
 def delete(id):
     result = faceRepository.delete(id)
     if(result):
