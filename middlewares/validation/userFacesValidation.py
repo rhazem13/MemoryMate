@@ -1,5 +1,5 @@
 from marshmallow import Schema,fields,ValidationError,validates,validate
-from repositories.UserRepo import UserRepo
+from repositories.userRepository import UserRepository
 from repositories.facesRepository import FacesRepository
 class UserFacesSchema(Schema):
     class Meta:
@@ -11,7 +11,7 @@ class UserFacesSchema(Schema):
 
     @validates('user_id')
     def validate_user_id(self, user_id):
-        user=UserRepo.get_by_id(user_id)
+        user=UserRepository().get_by_id(user_id)
         if(user==None):
             raise ValidationError("User Id Does Not Exist!")
         if(user.user_type!='PATIENT'):

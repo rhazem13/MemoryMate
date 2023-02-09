@@ -1,4 +1,7 @@
 from flask import request, jsonify
+from functools import wraps
+import jwt
+
 def token_required(f):
     @wraps(f)
     def decorated(*args, **kwargs):
@@ -11,11 +14,11 @@ def token_required(f):
             return jsonify({'message' : 'Token is missing!'}), 401
 
         try: 
-            data = jwt.decode(token,"'secret'")
-            current_user = UserRepo.query.filter_by(public_id=data['public_id']).first()
+            print(token)
+            data = jwt.decode(token,'secret', algorithms=['HS256'])
         except:
-            return jsonify({'message' : 'Token is invalid!'}), 401
+            return jsonify({'message' : 'you are not supposed to be here!'}), 401
 
-        return f(current_user, *args, **kwargs)
+        return f(*args, **kwargs)
 
     return decorated
