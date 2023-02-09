@@ -5,6 +5,6 @@ class UserfacesModel(db.Model,Base):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer,db.ForeignKey("user.id"))
     face_id = db.Column(db.Integer,db.ForeignKey("faces.id"))
-    name = db.Column(db.String(20), unique=True, nullable=False)
+    name = db.Column(db.String(20), nullable=False)
     bio = db.Column(db.String(100), nullable=False)
 
