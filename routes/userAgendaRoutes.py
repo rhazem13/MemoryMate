@@ -2,11 +2,15 @@ from flask import request, Blueprint
 from flask_restful import abort
 from repositories.agendaRepository import AgendaRepository
 from middlewares.validation.userAgendaValidation import UserAgendaSchema
+from middlewares.auth import token_required
+
+from middlewares.auth import token_required
 user_agenda_bp = Blueprint('useragenda', __name__)
 manySchema=UserAgendaSchema(many=True)
 singleSchema=UserAgendaSchema()
 agendaRepository = AgendaRepository()
 @user_agenda_bp.post('')
+@token_required
 def post():
     errors= UserAgendaSchema().validate(request.get_json())
     if errors:
@@ -17,11 +21,13 @@ def post():
     return singleSchema.dump(agendaRepository.create(payload))
 
 @user_agenda_bp.get('')
+@token_required
 def get():
     result= agendaRepository.get_all()
     return manySchema.dump(result)
 
 @user_agenda_bp.patch('/<int:id>')
+@token_required
 def patch(id):
     errors= UserAgendaSchema().validate(request.get_json(),partial=True)
     if errors:
@@ -33,6 +39,7 @@ def patch(id):
     return singleSchema.dump(result)
 
 @user_agenda_bp.delete('/<int:id>')
+@token_required
 def delete(id):
     result = agendaRepository.delete(id)
     if(result):

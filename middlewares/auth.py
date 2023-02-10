@@ -16,6 +16,7 @@ def token_required(f):
             return jsonify({'message' : 'Token is missing!'}), 401
 
         try: 
+            print(token)
             data = jwt.decode(token,os.environ['JWT_SECRET_KEY'], algorithms=['HS256'])
         except:
             return jsonify({'message' : 'you are not supposed to be here!'}), 401
