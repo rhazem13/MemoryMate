@@ -4,6 +4,7 @@ from flask_bcrypt import generate_password_hash,check_password_hash
 from models.user.userModel import User
 from validation.UserValidation import CreateUserscheme,LoginUserscheme
 from middlewares.auth import *
+
 from repositories.UserRepo import UserRepo
 import jwt
 import datetime
@@ -29,10 +30,18 @@ user_put_args.add_argument("password", type=str, help="type")
 
 
 
-@user_bp.get('/auth')
+@user_bp.get('/currentusertest')
 @token_required
-def get():
-    return {'message': 'authinticated successfully'}
+def get(current_user):
+  if  current_user.user_type=="PATIENT":
+    return {'message': 'the user is a patient'}
+  elif current_user.user_type=="CAREGIVER":
+    return {'message': 'the user is a caregiver'}
+  else:
+    return Response(status=403)  
+
+
+
 
 
 
@@ -92,7 +101,7 @@ def login():
 
     if check_password_hash( user.password,payload['password']):
         try:
-         token = jwt.encode({'id' : user.id, 'exp' : datetime.datetime.utcnow() + datetime.timedelta(minutes=30)},'secret') 
+         token = jwt.encode({'id' : user.id},'secret') #, 'exp' : datetime.datetime.utcnow() + datetime.timedelta()
          return jsonify({'token' : token})
         except ValidationError as err:
             print(err.messages)
