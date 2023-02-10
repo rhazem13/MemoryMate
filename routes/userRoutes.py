@@ -19,6 +19,7 @@ emitter = EventEmitter.getInstance()
 create_user_schema = CreateUserscheme()
 login_user_schema = LoginUserscheme()
 userRepository = UserRepository()
+UPLOAD_FOLDER = 'static\image'
 
 ALLOWED_EXTENSIONS = {'txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'}
 def allowed_file(filename):
@@ -57,7 +58,6 @@ def login():
             print(err.messages)
     return Response({"Wrong Password/Email"},status=403)  
 
-UPLOAD_FOLDER = 'static\image'
 @user_bp.post('/imageupload')
 def test():
     file = request.files['file']
