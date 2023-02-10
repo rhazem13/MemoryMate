@@ -3,6 +3,7 @@ import os
 from flask import Flask, request, jsonify
 from keras.models import load_model
 from flask import send_file
+from test import readb64
 os.environ['CUDA_VISIBLE_DEVICES'] = '-1'
 import base64
 import cv2
@@ -30,28 +31,22 @@ import numpy as np
 from keras.applications.densenet import DenseNet169
 
 model = load_model('../../../../Alzahemer_Detection/AlzhemersModel.h5')
-# print(type(model))
+## print(model.summary())
 
 
-
-
-
-
+class_avaible = ["Mild Dementia" , "Moderate Dementia" , "Non Demetia" , "Very Mild Dementia"]
 def prediction(image):
-   
+    
+
     img = load_img(image, target_size = (224,224,3))
     img = img_to_array(img)
-    img = img /255
-    inputs=tf.Tensor(shape=(img, 224, 224, 3), dtype=tf.float32, name='inputs')
-    training=False
-    mask=None
+    img = img/255
     imshow(img)
     plt.axis('off')
-    image = np.expand_dims(inputs,axis=0)
-    answer = model.predict(image)
-    probability = round(np.max(model.predict(image)*100),2)
-    print(f'probability : {probability } % of type  {answer}')
+    img = np.expand_dims(img,axis=0)
+    answer = model.predict(img)
+    probability = round(np.max(model.predict(img)*100),2)
+
+    print(probability, '% chances are there that the image is' , class_avaible[np.argmax(model.predict(img))])
 
 prediction("27.jpg")
-
-
