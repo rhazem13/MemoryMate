@@ -29,7 +29,7 @@ from keras.models import load_model
 import numpy as np  
 from keras.applications.densenet import DenseNet169
 
-model = load_model('AlzhemersModel.h5')
+model = load_model('../../../../Alzahemer_Detection/AlzhemersModel.h5')
 # print(type(model))
 
 
