@@ -1,5 +1,5 @@
 import os
-from repositories.UserRepo import UserRepo
+from repositories.userRepository import UserRepository
 from flask import request, jsonify
 from functools import wraps
 import jwt
