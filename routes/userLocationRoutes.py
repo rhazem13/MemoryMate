@@ -2,11 +2,14 @@ from flask import request, Blueprint
 from flask_restful import abort
 from repositories.locationRepository import LocationRepository
 from middlewares.validation.userLocationValidation import UserLocationSchema
+from middlewares.auth import token_required
+
 user_location_bp = Blueprint('userlocation', __name__)
 manySchema=UserLocationSchema(many=True)
 singleSchema=UserLocationSchema()
 locationRepository= LocationRepository()
 @user_location_bp.post('')
+# @token_required
 def post():
     
     errors= singleSchema.validate(request.get_json())
@@ -18,11 +21,13 @@ def post():
     return singleSchema.dump(locationRepository.create(payload))
 
 @user_location_bp.get('')
+# @token_required
 def get():
     result= locationRepository.get_all()
     return manySchema.dump(result)
 
 @user_location_bp.patch('/<int:id>')
+# @token_required
 def patch(id):
     errors= singleSchema.validate(request.get_json(),partial=True)
     if errors:
@@ -34,6 +39,7 @@ def patch(id):
     return singleSchema.dump(result)
 
 @user_location_bp.delete('/<int:id>')
+# @token_required
 def delete(id):
     result = locationRepository.delete(id)
     if(result):

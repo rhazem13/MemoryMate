@@ -1,5 +1,5 @@
 from marshmallow import Schema,fields,ValidationError,validates
-from repositories.UserRepo import UserRepo
+from repositories.userRepository import UserRepository
 
 class NotificationBodySchema(Schema):
     data = fields.String(required=True)
@@ -16,6 +16,6 @@ class NotificationSchema(Schema):
 
     @validates('user_id')
     def validate_user_id(self, user_id):
-        user=UserRepo.get_by_id(user_id)
+        user=UserRepository().get_by_id(user_id)
         if(user==None):
             raise ValidationError("User Id Does Not Exist!")

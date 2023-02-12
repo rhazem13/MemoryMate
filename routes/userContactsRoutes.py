@@ -2,11 +2,14 @@ from flask import request, Blueprint
 from flask_restful import abort
 from repositories.contactsRepository import ContactsRepository
 from middlewares.validation.userContactsValidation import UserContactsSchema
+from middlewares.auth import token_required
+
 user_contacts_bp = Blueprint('usercontacts', __name__)
 manySchema=UserContactsSchema(many=True)
 singleSchema=UserContactsSchema()
 contactsRepository= ContactsRepository()
 @user_contacts_bp.post('')
+@token_required
 def post():
     
     errors= singleSchema.validate(request.get_json())
@@ -18,11 +21,13 @@ def post():
     return singleSchema.dump(contactsRepository.create(payload))
 
 @user_contacts_bp.get('')
+@token_required
 def get():
     result= contactsRepository.get_all()
     return manySchema.dump(result)
 
 @user_contacts_bp.patch('/<int:id>')
+@token_required
 def patch(id):
     errors= singleSchema.validate(request.get_json(),partial=True)
     if errors:
@@ -34,6 +39,7 @@ def patch(id):
     return singleSchema.dump(result)
 
 @user_contacts_bp.delete('/<int:id>')
+@token_required
 def delete(id):
     result = contactsRepository.delete(id)
     if(result):
