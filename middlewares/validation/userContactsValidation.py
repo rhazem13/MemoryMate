@@ -1,5 +1,5 @@
 from marshmallow import Schema,fields,ValidationError,validates,validate
-from repositories.UserRepo import UserRepo
+from repositories.userRepository import UserRepository
 from models.UserContacts.relationLevelEnum  import ERelationLevel
 class UserContactsSchema(Schema):
     class Meta:
@@ -11,12 +11,12 @@ class UserContactsSchema(Schema):
 
     @validates('user_id')
     def validate_user_id(self, user_id):
-        user=UserRepo.get_by_id(user_id)
+        user=UserRepository().get_by_id(user_id)
         if(user==None):
             raise ValidationError("User Id Does Not Exist!")
     
     @validates('contact_id')
     def validate_contact_id(self, contact_id):
-        contact= UserRepo.get_by_id(contact_id)
+        contact= UserRepository().get_by_id(contact_id)
         if(contact==None):
             raise ValidationError("Contact Id does Not Exist!")
