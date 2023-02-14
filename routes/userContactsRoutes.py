@@ -9,7 +9,7 @@ manySchema=UserContactsSchema(many=True)
 singleSchema=UserContactsSchema()
 contactsRepository= ContactsRepository()
 @user_contacts_bp.post('')
-@token_required
+# @token_required
 def post():
     
     errors= singleSchema.validate(request.get_json())
@@ -21,7 +21,7 @@ def post():
     return singleSchema.dump(contactsRepository.create(payload))
 
 @user_contacts_bp.get('')
-@token_required
+# @token_required
 def get():
     result= contactsRepository.get_all()
     return manySchema.dump(result)
