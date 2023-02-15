@@ -11,7 +11,7 @@ from werkzeug.utils import secure_filename
 from services.caching.caching import CacheService
 from services.EventEmitter.event_emitter import EventEmitter
 from middlewares.auth import token_required
-
+from repositories.userAgendaRepository import UserAgendaRepository
 
 user_bp = Blueprint('users', __name__)
 cache = CacheService.get_instance()
@@ -25,6 +25,12 @@ ALLOWED_EXTENSIONS = {'txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'}
 def allowed_file(filename):
     return '.' in filename and \
         filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
+@user_bp.get('/test_schedule')
+def test_schedule():
+    UserAgendaRepository.findWithenInterval('')
+    return {"mes":"success"}
+        
 
 @user_bp.post('/register')
 def register():
