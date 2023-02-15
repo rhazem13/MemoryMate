@@ -6,6 +6,7 @@ from flask_migrate import Migrate
 from services.caching.caching import CacheService
 from dotenv import load_dotenv
 from models.db import db
+from routes.userRoutes import user_bp
 from routes.userLocationRoutes import user_location_bp
 from routes.userAgendaRoutes import user_agenda_bp
 from routes.userCalendarRoutes import user_calendar_bp
@@ -45,9 +46,7 @@ migrate.init_app(app, db)
 ma = Marshmallow(app)
 db.init_app(app)
 CacheService.initialize(app)
-from routes.userRoutes import UserRouters
-userRouter =  UserRouters()
-app.register_blueprint(userRouter.user_bp, url_prefix='/users')
+app.register_blueprint(user_bp, url_prefix='/users')
 app.register_blueprint(user_location_bp, url_prefix='/userlocation')
 app.register_blueprint(user_agenda_bp, url_prefix='/useragenda')
 app.register_blueprint(user_calendar_bp, url_prefix='/usercalendar')
