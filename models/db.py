@@ -1,3 +1,4 @@
+from geoalchemy2 import Geometry  # <= not used but must be imported
 from flask_sqlalchemy import SQLAlchemy
 from flask_marshmallow import Marshmallow
 from marshmallow import Schema, fields, post_load

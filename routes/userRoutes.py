@@ -1,10 +1,11 @@
 from flask import Flask, request, Blueprint,jsonify,make_response,session
 from flask_restful import Resource, reqparse, abort
 from flask_bcrypt import generate_password_hash,check_password_hash
-from models.user.userModel import User
-from validation.UserValidation import *
+from models.User.userModel import User
+from repositories.userRepository import UserRepository
+from middlewares.validation.userValidation import *
+from repositories.userRepository import UserRepository
 from middlewares.auth import *
-from repositories.UserRepo import UserRepo
 import jwt
 import datetime,time,random
 from flask import Response
@@ -15,10 +16,18 @@ from twilio.rest import Client
 from twilio.base.exceptions import TwilioRestException
 from models.db import db
 from dotenv import load_dotenv
+from services.caching.caching import CacheService
+from services.EventEmitter.event_emitter import EventEmitter
+from middlewares.auth import token_required
 
 
 load_dotenv()
 user_bp = Blueprint('users', __name__)
+cache = CacheService.get_instance()
+emitter = EventEmitter.getInstance()
+create_user_schema = CreateUserscheme()
+login_user_schema = LoginUserscheme()
+userRepository = UserRepository()
 UPLOAD_FOLDER = 'static\image'
 TWILIO_ACCOUNT_SID = os.environ.get('TWILIO_ACCOUNT_SID')
 TWILIO_AUTH_TOKEN= os.environ.get('TWILIO_AUTH_TOKEN')
@@ -28,53 +37,27 @@ client = Client(TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN)
 
 
 
-""" user_put_args = reqparse.RequestParser()
-
-user_put_args.add_argument("username", type=str, help="email")
-user_put_args.add_argument("password", type=str, help="password")
-user_put_args.add_argument("password", type=str, help="firstname")
-user_put_args.add_argument("password", type=str, help="lastname")
-user_put_args.add_argument("password", type=str, help="date_of_birth")
-user_put_args.add_argument("password", type=str, help="address")
-user_put_args.add_argument("password", type=str, help="type")
- """
-
-
-
-@user_bp.get('/currentusertest')
-@token_required
-def get(current_user):
-  if  current_user.user_type=="PATIENT":
-    return {'message': 'the user is a patient'}
-  elif current_user.user_type=="CAREGIVER":
-    return {'message': 'the user is a caregiver'}
-  else:
-    return Response(status=403)  
-
-
-
 ALLOWED_EXTENSIONS = {'txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'}
 def allowed_file(filename):
     return '.' in filename and \
-           filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+        filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
 @user_bp.post('/register')
 def register():
-
-    payload =request.get_json()['user']
-    create_user_schema = CreateUserscheme()
-    hashed_password = generate_password_hash(payload['password']).decode('utf-8')
-    errors = create_user_schema.validate(payload)
+    errors = create_user_schema.validate(request.get_json())
     if errors:
         return errors,422
-
+    payload =create_user_schema.load(request.json)
+    hashed_password = generate_password_hash(payload['password']).decode('utf-8')
+    payload['password'] = hashed_password
     try:
-     payload['password'] = hashed_password
-     user = UserRepo.create(payload)
-     return {'message': 'registered successfully'}
-    
+        user = userRepository.create(payload)
+        return {'message': 'registered successfully'}
     except ValidationError as err:
-    # print the error
-     print(err.messages) 
+        # print the error
+        print(err.messages) 
+
+
 
 @user_bp.post('/imageupload')
 def test():
@@ -99,7 +82,7 @@ login_user_schema = LoginUserscheme()
 @user_bp.post('/login')
 def login():
     payload = request.get_json()['user']
-    user = UserRepo.get_by_email(payload['email'])
+    user = UserRepository().get_by_email(payload['email'])
     errors = login_user_schema.validate(payload)
 
     if errors:
@@ -123,7 +106,8 @@ create_validation_schema = CreateResetPasswordEmailSendInputSchema()
 @user_bp.post('/reset')
 def reset():
     payload =request.get_json()['user']
-    user = UserRepo.get_by_email(payload['email'])
+    print(payload)
+    user = UserRepository().get_by_email(payload['email'])
     errors = create_validation_schema.validate(payload)
     channel=payload['channel']
     if errors:
@@ -144,12 +128,14 @@ def reset():
 def verify():
     
     payload =request.get_json()['user']
-    user = UserRepo.get_by_email(payload['email'])
+    user = UserRepository().get_by_email(payload['email'])
     phone_number=user.phone
     verification_code = payload['verificationcode']
     error = None
+
     if check_verification_token(phone_number,verification_code):
-     return {'message': 'auhinticated successfully'}
+        token = jwt.encode({'id' : user.id},'secret') #, 'exp' : datetime.datetime.utcnow() + datetime.timedelta()
+        return jsonify({'token' : token})
     
     error = "Invalid verification code. Please try again."
     return {'message': error }

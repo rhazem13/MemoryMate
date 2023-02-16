@@ -1,5 +1,5 @@
-from repositories.UserRepo import UserRepo
-from models.user.userModel import User
+from models.User.userModel import User
+from repositories.userRepository import UserRepository
 from flask import request, jsonify
 from functools import wraps
 import jwt
@@ -16,6 +16,7 @@ def token_required(f):
             return jsonify({'message' : 'Token is missing!'}), 401
 
         try: 
+            print(token)
             data = jwt.decode(token,'secret', algorithms=['HS256'])
             print("ok")
             current_user = User.query.filter_by(id=data['id']).first()       
