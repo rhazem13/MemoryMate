@@ -2,6 +2,7 @@ from marshmallow.validate import Length,OneOf,Regexp,URL
 from marshmallow import Schema, fields, validates, ValidationError
 import datetime
 import werkzeug
+from flask_wtf.file import FileField ,FileAllowed
 
 
 
@@ -10,6 +11,9 @@ user_types=['PATIENT','CAREGIVER']
 pass_regex=r"^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,}$"
 #starts with +country code
 phone_regex=r"^\+[1-9]{1}[0-9]{3,14}$"
+
+ALLOWED_EXTENSIONS = ['txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif']
+
 
 
 class CreateUserscheme(Schema):
@@ -33,3 +37,8 @@ class CreateUserscheme(Schema):
 class LoginUserscheme(Schema):
     email=fields.Email(required=True)
     password=fields.Str(required=True,validate=Regexp(pass_regex))
+
+class Memoryscheme(Schema):
+        thumbnail =fields.Raw(FileAllowed(ALLOWED_EXTENSIONS)) 
+
+
