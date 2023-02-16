@@ -17,6 +17,7 @@ user_bp = Blueprint('users', __name__)
 cache = CacheService.get_instance()
 emitter = EventEmitter.getInstance()
 create_user_schema = CreateUserscheme()
+locationschema = CreateUserscheme(many=True)
 login_user_schema = LoginUserscheme()
 userRepository = UserRepository()
 UPLOAD_FOLDER = 'static\image'
@@ -64,3 +65,9 @@ def test():
     filename = secure_filename(file.filename)
     file.save(os.path.join(UPLOAD_FOLDER, filename))
     return {'message': 'registered successfully'}
+
+@user_bp.get('/closefriendslocations/<int:id>')
+def get_close_friends_locations(id):
+    users = userRepository.get_close_friends_locations(id)
+    # print(users) 
+    return locationschema.dump(users)
