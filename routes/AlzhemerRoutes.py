@@ -1,7 +1,8 @@
 import os
+from tkinter import Image
 from urllib import response
 from MachineLearning.Alzahemer_Detection.Alzhemer import prediction
-from flask import Flask, request, jsonify,Response
+from flask import Flask, request, jsonify,Response, Blueprint
 from flask import Flask, render_template, request
 import pandas as pd
 import cv2
@@ -9,30 +10,40 @@ import numpy as np
 import base64
 from werkzeug.utils import secure_filename
 
-ALZhemer = Flask(__name__)
 
-UPLOAD_FOLDER = 'static\image'
+ALZhemer = Blueprint('Alzahemer', __name__)
 
 
-ALLOWED_EXTENSIONS = {'txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'}
-def allowed_file(filename):
-    return '.' in filename and \
-        filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
-@ALZhemer.route('/AD', methods=['GET', 'POST'])
-
+@ALZhemer.route('/Predict', methods=['GET' , 'POST'])
 def Predicit():
-      file = request.files['file']
-      filename = secure_filename(file.filename)
-      Photo =  file.save(os.path.join(UPLOAD_FOLDER, filename))
+    if  request.method == 'POST':
+         if 'pic' not in request.files:
+            resp = jsonify({'message':'No file part in the request'})
+            resp.status_code=400
+            return resp
+         pic =request.files['pic']
+         img_path =  "Alzhiemer/Tests/" + pic.filename
+          
+         pic.save(img_path)
 
-      return prediction(Photo)
-        
+         predict_result = prediction(img_path)
+
+         data = {
+            "result": predict_result
+            
+            
+        }
+         
+         return predict_result
+
+
+     
+               
+
             
 
-    
-                    
+             
+        
 
-    
-if __name__ == '__main__':
-    ALZhemer.run()
+                
