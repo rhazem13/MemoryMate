@@ -1,10 +1,10 @@
 import redis
-from flask import current_app
+# from flask import current_app
 class RedisService:
     redis_client = None
 
     @staticmethod
-    def getClient():
+    def getClient(current_app):
         if not RedisService.redis_client:
             host = current_app.config['CACHE_REDIS_HOST']
             port = current_app.config['CACHE_REDIS_PORT']

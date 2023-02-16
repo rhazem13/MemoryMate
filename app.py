@@ -18,6 +18,8 @@ from routes.eventsRoutes import events_bp
 from flask_migrate import Migrate
 from flask_marshmallow import Marshmallow
 from services.EventEmitter.event_emitter import EventEmitter
+from repositories.userAgendaRepository import UserAgendaRepository
+from services.redis.redis import RedisService
 
 import time
 import atexit
@@ -25,15 +27,7 @@ import atexit
 from apscheduler.schedulers.background import BackgroundScheduler
 
 
-def print_date_time():
-    print('time scheduler ')
-    print(time.strftime("%A, %d. %B %Y %I:%M:%S %p"))
 
-
-scheduler = BackgroundScheduler()
-scheduler.add_job(func=print_date_time, trigger="interval", seconds=60)
-scheduler.start()
-atexit.register(lambda: scheduler.shutdown())
 
 load_dotenv()
 
@@ -45,6 +39,7 @@ migrate= Migrate(app,db)
 migrate.init_app(app, db)
 ma = Marshmallow(app)
 db.init_app(app)
+redis_client = RedisService.getClient(app)
 CacheService.initialize(app)
 app.register_blueprint(user_bp, url_prefix='/users')
 app.register_blueprint(user_location_bp, url_prefix='/userlocation')
@@ -57,6 +52,21 @@ app.register_blueprint(user_face_bp, url_prefix='/userfaces')
 app.register_blueprint(events_bp, url_prefix='/events')
 socketio  = SocketIO(app, cors_allowed_origins='*')
 emitter = EventEmitter.getInstance()
+
+def notify_patients_drugs():
+    with app.app_context():
+        print('time scheduler ')
+        print(time.strftime("%A, %d. %B %Y %I:%M:%S %p"))
+        agendas = UserAgendaRepository.findWithenInterval(5)
+        for agenda in agendas:
+            id=agenda.id
+            redis_client.set(f"agenda-{id}","False")
+
+
+scheduler = BackgroundScheduler()
+scheduler.add_job(func=notify_patients_drugs, trigger="interval", seconds=60)
+scheduler.start()
+atexit.register(lambda: scheduler.shutdown())
 def test_event(keyword, name):
     print('test socket in function ')
     print(keyword, name)
