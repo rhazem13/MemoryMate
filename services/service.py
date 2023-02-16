@@ -5,7 +5,7 @@ from main import db
 from os import environ
 from services.helper import send_forgot_password_email
 from models.user.userModel import User
-from repositories import UserRepo
+from repositories import userRepository
 from flask_bcrypt import generate_password_hash
 from utils.common import generate_response, TokenGenerator
 from services.validation import (
@@ -28,10 +28,10 @@ def create_user(request, input_data):
     errors = create_validation_schema.validate(input_data)
     if errors:
         return generate_response(message=errors)
-    check_username_exist = UserRepo.query.filter_by(
+    check_username_exist = userRepository.query.filter_by(
         username=input_data.get("username")
     ).first()
-    check_email_exist = UserRepo.query.filter_by(email=input_data.get("email")).first()
+    check_email_exist = userRepository.query.filter_by(email=input_data.get("email")).first()
     if check_username_exist:
         return generate_response(
             message="Username already exist", status=HTTP_400_BAD_REQUEST
@@ -41,7 +41,7 @@ def create_user(request, input_data):
             message="Email  already taken", status=HTTP_400_BAD_REQUEST
         )
 
-    new_user = UserRepo(**input_data)  # Create an instance of the User class
+    new_user = userRepository(**input_data)  # Create an instance of the User class
     new_user.hash_password()
     db.session.add(new_user)  # Adds new User record to database
     db.session.commit()  # Comment
@@ -65,7 +65,7 @@ def login_user(request, input_data):
     if errors:
         return generate_response(message=errors)
 
-    get_user = UserRepo.query.filter_by(email=input_data.get("email")).first()
+    get_user = userRepository.query.filter_by(email=input_data.get("email")).first()
     if get_user is None:
         return generate_response(message="User not found", status=HTTP_400_BAD_REQUEST)
     if get_user.check_password(input_data.get("password")):
@@ -101,7 +101,7 @@ def reset_password_email_send(request, input_data):
     errors = create_validation_schema.validate(input_data)
     if errors:
         return generate_response(message=errors)
-    user = UserRepo.query.filter_by(email=input_data.get("email")).first()
+    user = userRepository.query.filter_by(email=input_data.get("email")).first()
     if user is None:
         return generate_response(
             message="No record found with this email. please signup first.",
@@ -124,13 +124,13 @@ def reset_password(request, input_data, token):
             status=HTTP_400_BAD_REQUEST,
         )
     token = TokenGenerator.decode_token(token)
-    user = UserRepo.query.filter_by(id=token.get('id')).first()
+    user = userRepository.query.filter_by(id=token.get('id')).first()
     if user is None:
         return generate_response(
             message="No record found with this email. please signup first.",
             status=HTTP_400_BAD_REQUEST,
         )
-    user = UserRepo.query.filter_by(id=token['id']).first()
+    user = userRepository.query.filter_by(id=token['id']).first()
     user.password = generate_password_hash(input_data.get('password')).decode("utf8")
     db.session.commit()
     return generate_response(
