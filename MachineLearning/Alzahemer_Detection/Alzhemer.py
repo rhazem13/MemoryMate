@@ -3,7 +3,6 @@ import os
 from flask import Flask, request, jsonify
 from keras.models import load_model
 from flask import send_file
-from test import readb64
 os.environ['CUDA_VISIBLE_DEVICES'] = '-1'
 import base64
 import cv2
@@ -46,7 +45,14 @@ def prediction(image):
     img = np.expand_dims(img,axis=0)
     answer = model.predict(img)
     probability = round(np.max(model.predict(img)*100),2)
+    probability /=100
+    if probability > 0.5:
+        Brain = str('%.2f' % (probability * 100) + '% Alzhemer')
+    else:
+        Brain = str('%.2f' % ((1 - probability) * 100) + '% NonAlzhemer')
 
     print(probability, '% chances are there that the image is' , class_avaible[np.argmax(model.predict(img))])
+ 
+    # return f"{probability} % chances are there that the image is , {class_avaible[np.argmax(model.predict(img))]}"
 
-prediction("27.jpg")
+    return {"probability":Brain  , "Class":class_avaible[np.argmax(model.predict(img))]}
