@@ -10,3 +10,14 @@ class LocationRepository(Repository):
         result = UserLocationModel.query.with_entities(UserLocationModel.additional_info,UserLocationModel.location_name,UserLocationModel.user_id,
         func.ST_AsGeoJSON(func.ST_Envelope(UserLocationModel.geom)).label('geom')).all()
         return result
+    def get_waypoints(self, id):
+        result = UserLocationModel.query.with_entities(UserLocationModel.additional_info,UserLocationModel.location_name,UserLocationModel.user_id,
+        func.ST_AsGeoJSON(func.ST_Envelope(UserLocationModel.geom)).label('geom')).filter(UserLocationModel.user_id==id).all()
+        print(result)
+        return result
+    def create(self,value):
+        new_value = self.repoModel(**value)
+        db.session.add(new_value)
+        db.session.commit()
+        db.session.refresh(new_value)
+        return new_value
