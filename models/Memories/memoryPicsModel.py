@@ -1,11 +1,9 @@
-from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy.orm import relationship
-from sqlalchemy.sql import func
 from models.db import db,Base
-from models.Memories.memoryPicsModel import Memory
-from sqlalchemy_imageattach.entity import Image, image_attachment
-class MemoPictures(db.Model,Base,Image):
+
+# from models.Memories.memoryPicsModel import Memory
+class MemoPictures(db.Model,Base):
     __tablename__ = 'memory_picture'
 
-    id = db.Column(db.Integer, db.ForeignKey('user.id'), primary_key=True)
-    memory = relationship('Memory')
+    id = db.Column(db.Integer, primary_key=True)
+    memory_id = db.Column(db.Integer, db.ForeignKey("memory.id"))
+    # memory = relationship('Memory')
