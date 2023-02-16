@@ -18,7 +18,8 @@ def post():
     payload =UserLocationSchema().load(request.json)
     if('id' in payload):
         return "Id field shouldn't be entered",422
-    return singleSchema.dump(locationRepository.create(payload))
+    locationRepository.create(payload)
+    return "created waypoint"
 
 @user_location_bp.get('')
 # @token_required
@@ -45,3 +46,8 @@ def delete(id):
     if(result):
         return {"deleted":f"{id}"}
     abort(404)
+
+@user_location_bp.get('<int:id>')
+def get_waypoints(id):
+    result = locationRepository.get_waypoints(id)
+    return manySchema.dump(result)
