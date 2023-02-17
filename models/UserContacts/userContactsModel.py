@@ -5,5 +5,5 @@ class UserContacts(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey("user.id"))
     contact_id=db.Column(db.Integer, db.ForeignKey("user.id"))
-    relation=db.Column(db.Enum(ERelationLevel), nullable=False)
+    relation=db.Column(db.String(20), nullable=False)
     bio= db.Column(db.Text())

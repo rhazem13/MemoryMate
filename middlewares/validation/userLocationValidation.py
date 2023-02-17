@@ -1,14 +1,6 @@
 import json
 from marshmallow import Schema,fields,ValidationError,validates
 from repositories.userRepository import UserRepository
-from models.User.userTypeEnum import EUserType
-from geoalchemy2.shape import to_shape
-from geojson import geometry
-from geoalchemy2 import Geometry
-import geojson
-from shapely.geometry import Polygon
-from sqlalchemy import func
-from shapely import wkb
 
 class UserLocationSchema(Schema):
     class Meta:
@@ -21,6 +13,7 @@ class UserLocationSchema(Schema):
     def get_geom(self, obj):
         # print(wkb.loads(bytes(obj.geom)))
         # print(to_shape(obj.geom))
+        print(obj.geom)
         return json.loads(obj.geom)
 
     def load_geom(self, obj):
