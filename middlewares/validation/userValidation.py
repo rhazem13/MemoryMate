@@ -7,10 +7,10 @@ import werkzeug
 
 user_types=['PATIENT','CAREGIVER']
 #Minimum eight characters, at least one letter, one number and one special character:
-pass_regex=r"^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,}$"
+pass_regex=r"^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&)])[A-Za-z\d@$!%*#?&)]{8,}$"
 #starts with +country code
 phone_regex=r"^\+[1-9]{1}[0-9]{3,14}$"
-channels=['sms','call']
+channels=['sms','call','whatsapp']
 
 
 class CreateUserscheme(Schema):
@@ -38,7 +38,12 @@ class LoginUserscheme(Schema):
 class CreateResetPasswordEmailSendInputSchema(Schema):
     # the 'required' argument ensures the field exists
     email = fields.Email(required=True)
-    channel=fields.Str(required=True,validate=OneOf(channels))
+    channel=fields.Str(required=True,validate=OneOf(channels),error="the channel sent is not correct")
+
+class VerifyEmailaddress(Schema):
+    # the 'required' argument ensures the field exists
+    email = fields.Email(required=True)
+    verificationcode=fields.Int(required=True)
 
 class ResetPasswordInputSchema(Schema):
     # the 'required' argument ensures the field exists
