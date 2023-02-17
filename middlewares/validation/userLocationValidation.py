@@ -1,7 +1,7 @@
 import json
 from marshmallow import Schema,fields,ValidationError,validates
 from repositories.userRepository import UserRepository
-from models.User.userTypeEnum import EUserType
+from models.user.userTypeEnum import EUserType
 from geoalchemy2.shape import to_shape
 from geojson import geometry
 from geoalchemy2 import Geometry
