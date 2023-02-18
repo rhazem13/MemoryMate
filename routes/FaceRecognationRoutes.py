@@ -68,7 +68,7 @@ def Recognation():
             resp.status_code=400
             return resp
          pic =request.files['ph']
-         img_path =  "Faces/Tests" + pic.filename
+         img_path =  "Faces/Tests/" + pic.filename
           
          pic.save(img_path)
 
