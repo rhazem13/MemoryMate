@@ -1,20 +1,25 @@
-from flask import Flask, request, Blueprint,jsonify,make_response
-from flask_restful import Resource, reqparse, abort
+from flask import request, Blueprint
 from flask_bcrypt import generate_password_hash,check_password_hash
-from models.user.userModel import User
-from validation.UserValidation import CreateUserscheme,LoginUserscheme
-from middlewares.auth import *
-
-from repositories.UserRepo import UserRepo
+from middlewares.validation.userValidation import CreateUserscheme,LoginUserscheme
+from repositories.userRepository import UserRepository
 import jwt
 import datetime
 from flask import Response
 from marshmallow import  ValidationError
 import os
 from werkzeug.utils import secure_filename
+from services.caching.caching import CacheService
+from services.EventEmitter.event_emitter import EventEmitter
+from middlewares.auth import token_required
 
 
 user_bp = Blueprint('users', __name__)
+cache = CacheService.get_instance()
+emitter = EventEmitter.getInstance()
+create_user_schema = CreateUserscheme()
+locationschema = CreateUserscheme(many=True)
+login_user_schema = LoginUserscheme()
+userRepository = UserRepository()
 UPLOAD_FOLDER = 'static\image'
 
 """ user_put_args = reqparse.RequestParser()
@@ -48,25 +53,39 @@ def get(current_user):
 ALLOWED_EXTENSIONS = {'txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'}
 def allowed_file(filename):
     return '.' in filename and \
-           filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+        filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
 @user_bp.post('/register')
 def register():
-
-    payload =request.get_json()['user']
-    create_user_schema = CreateUserscheme()
-    hashed_password = generate_password_hash(payload['password']).decode('utf-8')
-    errors = create_user_schema.validate(payload)
+    errors = create_user_schema.validate(request.get_json())
     if errors:
         return errors,422
-
+    payload =create_user_schema.load(request.json)
+    hashed_password = generate_password_hash(payload['password']).decode('utf-8')
+    payload['password'] = hashed_password
     try:
-     payload['password'] = hashed_password
-     user = UserRepo.create(payload)
-     return {'message': 'registered successfully'}
-    
+        user = userRepository.create(payload)
+        return {'message': 'registered successfully'}
     except ValidationError as err:
-    # print the error
-     print(err.messages) 
+        # print the error
+        print(err.messages) 
+
+@user_bp.post('/login')
+def login():
+    errors = login_user_schema.validate(request.get_json())
+    if errors:
+        return errors,422
+    payload = login_user_schema.load(request.json)
+    user = userRepository.get_by_email(payload['email'])
+    if  user is None:
+        return Response({"Wrong Password/Email"},status=403)  
+    if check_password_hash(user.password,payload['password']):
+        try:
+            token = jwt.encode({'id' : user.id, 'exp' : datetime.datetime.utcnow() + datetime.timedelta(minutes=30)},'secret') 
+            return {'token': token}
+        except ValidationError as err:
+            print(err.messages)
+    return Response({"Wrong Password/Email"},status=403)  
 
 @user_bp.post('/imageupload')
 def test():
@@ -75,45 +94,8 @@ def test():
     file.save(os.path.join(UPLOAD_FOLDER, filename))
     return {'message': 'registered successfully'}
 
-# @user_bp.get('/protected')
-# @token_required
-# def get():
-#         return "protected"
-
-# @user_bp.get('/unprotected')
-# def get():
-#         return "unprotected"
-
-
-
-
-login_user_schema = LoginUserscheme()
-@user_bp.post('/login')
-def login():
-    payload = request.get_json()['user']
-    user = UserRepo.get_by_email(payload['email'])
-    errors = login_user_schema.validate(payload)
-
-    if errors:
-        return errors,422
-    elif  user is None:
-        return Response(status = 404)   
-
-    if check_password_hash( user.password,payload['password']):
-        try:
-         token = jwt.encode({'id' : user.id},'secret') #, 'exp' : datetime.datetime.utcnow() + datetime.timedelta()
-         return jsonify({'token' : token})
-        except ValidationError as err:
-            print(err.messages)
-
-    return Response(status=403)  
-    
-    
-   
-
-#@user_bp.get("/me") / it returns the information of the current user based on the token
-
-#@user_bp.get('/locations') it returns the locations of the current user
-
-#@user_bp.post('/locations') it adds a location for a user
-#@user_bp.put('/locations/{location_id}') it updates a location by it's id
+@user_bp.get('/closefriendslocations/<int:id>')
+def get_close_friends_locations(id):
+    users = userRepository.get_close_friends_locations(id)
+    # print(users) 
+    return locationschema.dump(users)
