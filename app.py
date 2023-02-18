@@ -61,6 +61,8 @@ def notify_patients_drugs():
         for agenda in agendas:
             id=agenda.id
             redis_client.set(f"agenda-{id}","False")
+        UserAgendaRepository.updateStartTimeWithInterval()
+        
 
 
 scheduler = BackgroundScheduler()
