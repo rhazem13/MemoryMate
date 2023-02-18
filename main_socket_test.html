@@ -9,10 +9,11 @@
 <script type="text/javascript">
 $(document).ready(function() {
 // sending a connect request to the server.
-var socket = io.connect('http://localhost:5000',{extraHeaders:{token:'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MzR9.OaUeo65_ohuSSYLS6vd09cVtzn2k5IpFvci3hOvcagE'}});
+var socket = io.connect('http://localhost:5000',{extraHeaders:{'x-access-token':'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6M30.l0XNQnn4xYlUafFxowInkYLvF3qvdwJ1iPcuf4Y_M90'}});
 socket.on ('test connect', function(connectMsg) {
 $('#log').append('<br>' + $('<div/>').text('What is the intention of the code: ' + connectMsg.data).html());
 });
+socket.on('agenda-notify',data=>console.log(data))
 });
 </script>
 

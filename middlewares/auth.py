@@ -4,7 +4,7 @@ from flask import request, jsonify
 from functools import wraps
 import jwt
 
-def token_required(f):
+def token_required(f): 
     @wraps(f)
     def decorated(*args, **kwargs):
         token = None
@@ -13,14 +13,14 @@ def token_required(f):
             token = request.headers['x-access-token']
 
         if not token:
+            print('not token')
             return jsonify({'message' : 'Token is missing!'}), 401
 
         try: 
-            print(token)
             data = jwt.decode(token,'secret', algorithms=['HS256'])
-            print("ok")
-            current_user = User.query.filter_by(id=data['id']).first()       
-        except:
+            current_user = User.query.filter_by(id=data['id']).first()    
+        except Exception as ex:
+            print('err', ex)
             return jsonify({'message' : 'you are not supposed to be here!'}), 401
 
         return f(current_user,*args, **kwargs)

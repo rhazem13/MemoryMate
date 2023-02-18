@@ -12,6 +12,10 @@ class UserAgendaRepository(Repository):
         result = UserAgenda.query.filter((func.date_trunc('minute',UserAgenda.start_time+UserAgenda.repeat_interval)>=func.date_trunc('minute',func.now()))&(
         func.date_trunc('minute', UserAgenda.start_time+UserAgenda.repeat_interval)<=func.date_trunc('minute',func.now()+func.cast(concat(interval, 'MINUTES'), INTERVAL)))).all()
         return result
+    
+    def getExpiredAgenda():
+        result = UserAgenda.query.filter(UserAgenda.start_time<func.now()).all()
+        return result
 
     def updateStartTimeWithInterval():
         print('in update function ')
