@@ -5,14 +5,17 @@
 <title>Tutorial on Flask: A Web socket example</title>
 <script src="https://code.jquery.com/jquery-3.3.1.js"></script>
 <script src="https://cdn.socket.io/4.5.4/socket.io.min.js" integrity="sha384-/KNQL8Nu5gCHLqwqfQjA689Hhoqgi2S84SNUxC3roTe4EhJ9AfLkp8QiQcU8AMzI" crossorigin="anonymous"></script><script type="text/javascript">
+    </script>
+<script type="text/javascript">
 $(document).ready(function() {
 // sending a connect request to the server.
-var socket = io.connect('http://localhost:5000',{query:{token:'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MzR9.OaUeo65_ohuSSYLS6vd09cVtzn2k5IpFvci3hOvcagEsharaf'}});
-socket.on('after connect', function(connectMsg) {
+var socket = io.connect('http://localhost:5000',{extraHeaders:{token:'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MzR9.OaUeo65_ohuSSYLS6vd09cVtzn2k5IpFvci3hOvcagE'}});
+socket.on ('test connect', function(connectMsg) {
 $('#log').append('<br>' + $('<div/>').text('What is the intention of the code: ' + connectMsg.data).html());
 });
 });
 </script>
+
 </head>
 </head>
 <body>

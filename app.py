@@ -29,6 +29,8 @@ from apscheduler.schedulers.background import BackgroundScheduler
 
 
 
+#from routes.AlzhemerRoutes import ALZhemer
+#from routes.FaceRecognationRoutes import FaceRecognation
 load_dotenv()
 
 app = Flask(__name__)
@@ -50,6 +52,9 @@ app.register_blueprint(notification_bp, url_prefix='/notifications')
 app.register_blueprint(user_contacts_bp, url_prefix='/usercontacts') 
 app.register_blueprint(user_face_bp, url_prefix='/userfaces')
 app.register_blueprint(events_bp, url_prefix='/events')
+#app.register_blueprint(ALZhemer, url_prefix='/Alzahemer')
+#app.register_blueprint(FaceRecognation, url_prefix='/Face')
+
 socketio  = SocketIO(app, cors_allowed_origins='*')
 emitter = EventEmitter.getInstance()
 
@@ -74,6 +79,8 @@ def test_event(keyword, name):
     print(keyword, name)
 print('event test has gone')
 @socketio.on('connect')
+
+
 def test_connect():
     print('sharaf')
     emitter.on('an-event', test_event)
