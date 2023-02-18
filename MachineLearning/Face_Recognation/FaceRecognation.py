@@ -3,26 +3,21 @@ import cv2
 import numpy as np
 import os
 
-path = "./train/"
+def TestFaces(test_image):
+        path = "./train/"
 
-known_names = []
-known_name_encodings = []
-def TrainFaces():
-    images = os.listdir(path)
-    for _ in images:
-            image = fr.load_image_file(path + _)
-            image_path = path + _
-            encoding = fr.face_encodings(image)[0]
+        known_names = []
+        known_name_encodings = []
+        images = os.listdir(path)
+        for _ in images:
+                image = fr.load_image_file(path + _)
+                image_path = path + _
+                encoding = fr.face_encodings(image)[0]
+                known_name_encodings.append(encoding)
+                known_names.append(os.path.splitext(os.path.basename(image_path))[0].capitalize())
 
-            known_name_encodings.append(encoding)
-            known_names.append(os.path.splitext(os.path.basename(image_path))[0].capitalize())
-
-            
-    print(known_names)
-TrainFaces()
-########################################################
-test_image = "./test/oo.jpg"
-def TestFaces():
+                
+        # print(known_names)
         image = cv2.imread(test_image)
         # image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
 
@@ -46,9 +41,13 @@ def TestFaces():
             font = cv2.FONT_HERSHEY_DUPLEX
             cv2.putText(image, name, (left + 6, bottom - 6), font, 1.0, (255, 255, 255), 1)
 
+        print({"The Person is": name})
 
-        cv2.imshow("Result", image)
+       # cv2.imshow("Result", image)
         cv2.imwrite("./output.jpg", image)
-        cv2.waitKey(0)
-        cv2.destroyAllWindows()
-TestFaces()
+       # cv2.waitKey(0)
+        # cv2.destroyAllWindows()
+
+        return {"The Person is": name}
+
+#TestFaces('./test/test.jpg')
