@@ -16,7 +16,7 @@ from werkzeug.utils import secure_filename
 FaceRecognation = Blueprint('Face', __name__)
 
 @FaceRecognation.route('/Rec', methods=['GET' , 'POST'])
-def Predicit():
+def Recognation():
     def TestFaces(test_image):
         path = "MachineLearning/Face_Recognation/train/"
 
@@ -31,9 +31,9 @@ def Predicit():
                 known_names.append(os.path.splitext(os.path.basename(image_path))[0].capitalize())
 
                 
-        # print(known_names)
+       
         image = cv2.imread(test_image)
-        # image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+        
 
         face_locations = fr.face_locations(image)
         face_encodings = fr.face_encodings(image, face_locations)
@@ -55,14 +55,12 @@ def Predicit():
             font = cv2.FONT_HERSHEY_DUPLEX
             cv2.putText(image, name, (left + 6, bottom - 6), font, 1.0, (255, 255, 255), 1)
 
-        #print({"The Person is": name})
-
-       # cv2.imshow("Result", image)
+     
         cv2.imwrite("MachineLearning/Face_Recognation/output.jpg", image)
-       # cv2.waitKey(0)
-        # cv2.destroyAllWindows()
+       
 
         return {"The Person is": name}
+    
     if  request.method == 'POST':
          
          if 'ph' not in request.files:
