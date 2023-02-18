@@ -18,6 +18,7 @@ from routes.eventsRoutes import events_bp
 from flask_migrate import Migrate
 from flask_marshmallow import Marshmallow
 from services.EventEmitter.event_emitter import EventEmitter
+
 #from routes.AlzhemerRoutes import ALZhemer
 #from routes.FaceRecognationRoutes import FaceRecognation
 load_dotenv()
