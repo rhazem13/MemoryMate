@@ -19,7 +19,7 @@ from flask_migrate import Migrate
 from flask_marshmallow import Marshmallow
 from services.EventEmitter.event_emitter import EventEmitter
 from routes.AlzhemerRoutes import ALZhemer
-
+from routes.FaceRecognationRoutes import FaceRecognation
 load_dotenv()
 
 app = Flask(__name__)
@@ -41,6 +41,7 @@ app.register_blueprint(user_contacts_bp, url_prefix='/usercontacts')
 app.register_blueprint(user_face_bp, url_prefix='/userfaces')
 app.register_blueprint(events_bp, url_prefix='/events')
 app.register_blueprint(ALZhemer, url_prefix='/Alzahemer')
+app.register_blueprint(FaceRecognation, url_prefix='/Face')
 
 socketio  = SocketIO(app, cors_allowed_origins='*')
 emitter = EventEmitter.getInstance()
