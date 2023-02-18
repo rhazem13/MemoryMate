@@ -17,9 +17,9 @@ def TestFaces(test_image):
                 known_names.append(os.path.splitext(os.path.basename(image_path))[0].capitalize())
 
                 
-        # print(known_names)
+   
         image = cv2.imread(test_image)
-        # image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+      
 
         face_locations = fr.face_locations(image)
         face_encodings = fr.face_encodings(image, face_locations)
