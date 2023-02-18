@@ -70,29 +70,39 @@ def notify_patients_drugs():
             redis_client.set(f"agenda-{id}", "False")
             user_id = agenda.user_id
             notification = {
-                "user_id":user_id,
-                "title":"لقد نسيت أخذ الدواء",
-                "body":{
-                    "content":"لقد نسيت اخذ دواء الساعة 7"
+                "user_id": user_id,
+                "title": "لقد نسيت أخذ الدواء",
+                "body": {
+                    "content": "لقد نسيت اخذ دواء الساعة 7"
                 },
-                "type":"important"
-                }
+                "type": "important"
+            }
             print(emitter._callbacks)
-            emitter.emit(f"notify_user-{user_id}",user_id,  notification)
-            
+            emitter.emit(f"notify_user-{user_id}", user_id,  notification)
+
         UserAgendaRepository.updateStartTimeWithInterval()
+        expired_agendas = UserAgendaRepository.getExpiredAgenda()
+        for agenda in expired_agendas:
+            emitter.emit(f"notify_user-{user_id}", user_id, {
+                "user_id": user_id,
+                "title": "قريبك مخدش الدوا",
+                "body": {
+                    "content": "قريبك نسي ياخد الدوا"
+                },
+                "type": "important"
+            })
 
 
 scheduler = BackgroundScheduler()
 scheduler.add_job(func=notify_patients_drugs, trigger="interval", seconds=60)
-scheduler.start()
+""" scheduler.start()
 atexit.register(lambda: scheduler.shutdown())
-
+ """
 
 def notify_user(user_id, notification):
-    print('notification for user ', user_id,notification)
+    print('notification for user ', user_id, notification)
     NotificationsRepository().create(notification)
-    socketio.emit('agenda-notify',{"content":"hiiiiiii"})
+    socketio.emit('agenda-notify', {"content": "hiiiiiii"})
     print('emit for user')
 
 
@@ -110,7 +120,7 @@ def test_connect(cur_user):
 def agenda_reminded(cur_user, data):
     agenda_id = data['agenda_id']
     redis_client.delete(f"agenda-{agenda_id}")
-    
+
 # testing emitter,, hazem
 
 
