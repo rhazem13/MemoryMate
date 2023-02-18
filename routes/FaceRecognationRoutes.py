@@ -1,10 +1,24 @@
+import os
+from tkinter import Image
+from urllib import response
 import face_recognition as fr
 import cv2
 import numpy as np
 import os
+from flask import Flask, request, jsonify,Response, Blueprint
+from flask import Flask, render_template, request
+import pandas as pd
+import cv2
+import numpy as np
+from werkzeug.utils import secure_filename
 
-def TestFaces(test_image):
-        path = "/MachineLearning/Face_Recognation/train/"
+
+FaceRecognation = Blueprint('Face', __name__)
+
+@FaceRecognation.route('/Rec', methods=['GET' , 'POST'])
+def Predicit():
+    def TestFaces(test_image):
+        path = "MachineLearning/Face_Recognation/train/"
 
         known_names = []
         known_name_encodings = []
@@ -41,13 +55,27 @@ def TestFaces(test_image):
             font = cv2.FONT_HERSHEY_DUPLEX
             cv2.putText(image, name, (left + 6, bottom - 6), font, 1.0, (255, 255, 255), 1)
 
-        print({"The Person is": name})
+        #print({"The Person is": name})
 
        # cv2.imshow("Result", image)
-        cv2.imwrite("./output.jpg", image)
+        cv2.imwrite("MachineLearning/Face_Recognation/output.jpg", image)
        # cv2.waitKey(0)
         # cv2.destroyAllWindows()
 
         return {"The Person is": name}
+    if  request.method == 'POST':
+         
+         if 'ph' not in request.files:
+            resp = jsonify({'message':'No file part in the request'})
+            resp.status_code=400
+            return resp
+         pic =request.files['ph']
+         img_path =  "Faces/Tests" + pic.filename
+          
+         pic.save(img_path)
 
-#TestFaces('./test/test.jpg')
+         predict_result = TestFaces(img_path)
+
+       
+         
+         return predict_result
