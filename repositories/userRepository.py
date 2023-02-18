@@ -12,6 +12,7 @@ from models.UserContacts.userContactsModel import UserContacts
 from models.UserFaces.userfacesModel import UserfacesModel
 from models.User.userTypeEnum import EUserType
 from repositories.repository import Repository
+from repositories.contactsRepository import ContactsRepository
 from sqlalchemy.orm import load_only
 from sqlalchemy import func
 
@@ -42,4 +43,12 @@ class UserRepository(Repository):
 
    def get_attr(id, attr):
       users = session.query(SomeModel).options(load_only(*fields)).all()
+
+   def get_caregivers_by_patient_id(patient_id):
+      contacts = ContactsRepository.findByUserId(patient_id)
+      ids = list()
+      for contact in contacts:
+         ids.append(contact.contact_id)
+      result = User.query.filter(User.id.in_(ids)).all()
+      return result 
 
