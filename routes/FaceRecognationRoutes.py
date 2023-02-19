@@ -11,6 +11,23 @@ import numpy as np
 
 FaceRecognation = Blueprint('Face', __name__)
 
+@FaceRecognation.route('/Save' , methods=['POST'])
+def SaveIamage():
+     
+      if 'file' not in request.files:
+            resp = jsonify({'message':'No file part in the request'})
+            resp.status_code=400
+            return resp
+      pic =request.files['file']
+      img_path =  "MachineLearning/Face_Recognation/train/" + pic.filename
+          
+      pic.save(img_path)
+
+
+       
+         
+      return jsonify("Image Saved Successfully")
+
 @FaceRecognation.route('/Rec', methods=['GET' , 'POST'])
 def Recognation():
     def TestFaces(test_image):
