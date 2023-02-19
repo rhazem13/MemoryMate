@@ -39,5 +39,3 @@ class CreateUserscheme(Schema):
 class LoginUserscheme(Schema):
     email=fields.Email(required=True)
     password=fields.Str(required=True,validate=Regexp(pass_regex))
-class Memoryscheme(Schema):
-    thumbnail =fields.Str() 
