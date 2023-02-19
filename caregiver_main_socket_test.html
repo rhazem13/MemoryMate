@@ -2,22 +2,19 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Patient</title>
+<title>Caregiver</title>
 <script src="https://code.jquery.com/jquery-3.3.1.js"></script>
 <script src="https://cdn.socket.io/4.5.4/socket.io.min.js" integrity="sha384-/KNQL8Nu5gCHLqwqfQjA689Hhoqgi2S84SNUxC3roTe4EhJ9AfLkp8QiQcU8AMzI" crossorigin="anonymous"></script><script type="text/javascript">
     </script>
 <script type="text/javascript">
 $(document).ready(function() {
 // sending a connect request to the server.
-var socket = io.connect('http://localhost:5000',{extraHeaders:{'x-access-token':'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6M30.l0XNQnn4xYlUafFxowInkYLvF3qvdwJ1iPcuf4Y_M90'}});
+var socket = io.connect('http://localhost:5000',{extraHeaders:{'x-access-token':'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6NX0.c2ZeBoTXp01vPI_v5qGti5QyLyIsijJDMHrTP_DGNOc'}});
 socket.on ('test connect', function(connectMsg) {
 $('#log').append('<br>' + $('<div/>').text('What is the intention of the code: ' + connectMsg.data).html());
 });
 socket.on('agenda-notify',data=>{
-    let confirm = window.confirm("don't forget your pills")
-    if (confirm){
-        socket.emit('reminded',{agenda_id:1})
-    }
+    let confirm = window.confirm("your patient forgot his pills")
 
 })
 });
