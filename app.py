@@ -16,6 +16,7 @@ from routes.userContactsRoutes import user_contacts_bp
 from routes.userFacesRoutes import user_face_bp
 from routes.eventsRoutes import events_bp
 from repositories.notificationsRepository import NotificationsRepository
+from repositories.userRepository import UserRepository
 from flask_migrate import Migrate
 from flask_marshmallow import Marshmallow
 from services.EventEmitter.event_emitter import EventEmitter
@@ -79,26 +80,34 @@ def notify_patients_drugs():
             }
             print(emitter._callbacks)
             emitter.emit(f"notify_user-{user_id}", user_id,  notification)
-
-        UserAgendaRepository.updateStartTimeWithInterval()
         expired_agendas = UserAgendaRepository.getExpiredAgenda()
+        # UserAgendaRepository.updateStartTimeWithInterval()
+        print('expired_agendas are',expired_agendas)
         for agenda in expired_agendas:
-            emitter.emit(f"notify_user-{user_id}", user_id, {
-                "user_id": user_id,
-                "title": "قريبك مخدش الدوا",
-                "body": {
-                    "content": "قريبك نسي ياخد الدوا"
-                },
-                "type": "important"
-            })
+            agenda_id = agenda.id
+            if redis_client.get(f"agenda-{agenda_id}") is None:
+                continue
+            
+            caregivers = UserRepository.get_caregivers_by_patient_id(agenda.user_id)
+            print(caregivers)
+            for caregiver in caregivers:
+                caregiver_id = caregiver.id
+                emitter.emit(f"notify_user-{caregiver_id}", caregiver_id, {
+                    "user_id": caregiver_id,
+                    "title": "قريبك مخدش الدوا",
+                    "body": {
+                        "content": "قريبك نسي ياخد الدوا"
+                    },
+                    "type": "important"
+                })
+
 
 
 scheduler = BackgroundScheduler()
 scheduler.add_job(func=notify_patients_drugs, trigger="interval", seconds=60)
-""" scheduler.start()
+scheduler.start()
 atexit.register(lambda: scheduler.shutdown())
- """
-
+ 
 def notify_user(user_id, notification):
     print('notification for user ', user_id, notification)
     NotificationsRepository().create(notification)
@@ -111,15 +120,16 @@ def notify_user(user_id, notification):
 def test_connect(cur_user):
     user_id = cur_user.id
     emitter.on(f'notify_user-{user_id}', notify_user)
-    socketio.emit('after connect', {
-                  'data': 'Let us learn Web Socket in Flask'})
+
 
 
 @socketio.on('reminded')
 @token_required
 def agenda_reminded(cur_user, data):
+    print(data)
     agenda_id = data['agenda_id']
     redis_client.delete(f"agenda-{agenda_id}")
+    print('user getting reminded')
 
 # testing emitter,, hazem
 

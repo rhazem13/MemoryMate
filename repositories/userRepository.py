@@ -46,6 +46,7 @@ class UserRepository(Repository):
 
    def get_caregivers_by_patient_id(patient_id):
       contacts = ContactsRepository.findByUserId(patient_id)
+      print('contacts are ',contacts)
       ids = list()
       for contact in contacts:
          ids.append(contact.contact_id)
