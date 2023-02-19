@@ -20,7 +20,7 @@ create_user_schema = CreateUserscheme()
 locationschema = CreateUserscheme(many=True)
 login_user_schema = LoginUserscheme()
 userRepository = UserRepository()
-UPLOAD_FOLDER = 'static\image'
+UPLOAD_FOLDER = 'static\\faces\\'
 
 ALLOWED_EXTENSIONS = {'txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'}
 def allowed_file(filename):
@@ -33,6 +33,7 @@ def register():
     if errors:
         return errors,422
     payload =create_user_schema.load(request.json)
+
     hashed_password = generate_password_hash(payload['password']).decode('utf-8')
     payload['password'] = hashed_password
     try:
@@ -53,7 +54,7 @@ def login():
         return Response({"Wrong Password/Email"},status=403)  
     if check_password_hash(user.password,payload['password']):
         try:
-            token = jwt.encode({'id' : user.id, 'exp' : datetime.datetime.utcnow() + datetime.timedelta(minutes=30)},'secret') 
+            token = jwt.encode({'id' : user.id},'secret') #, 'exp' : datetime.datetime.utcnow() + datetime.timedelta(minutes=30)
             return {'token': token}
         except ValidationError as err:
             print(err.messages)
@@ -62,12 +63,15 @@ def login():
 @user_bp.post('/imageupload')
 def test():
     file = request.files['file']
-    filename = secure_filename(file.filename)
-    file.save(os.path.join(UPLOAD_FOLDER, filename))
-    return {'message': 'registered successfully'}
+    file_name = secure_filename(file.filename)
+    file_path =  UPLOAD_FOLDER+ file.filename
+    file.save(UPLOAD_FOLDER + file_name)
+    print (file_path)
+    return {'message': 'uploaded successfully'}
 
 @user_bp.get('/closefriendslocations/<int:id>')
 def get_close_friends_locations(id):
+
     users = userRepository.get_close_friends_locations(id)
     # print(users) 
     return locationschema.dump(users)

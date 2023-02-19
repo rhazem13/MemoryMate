@@ -8,6 +8,7 @@ from dotenv import load_dotenv
 from models.db import db
 from routes.userRoutes import user_bp
 from routes.userLocationRoutes import user_location_bp
+from routes.memoriesRoutes import user_memories_bp
 from routes.userAgendaRoutes import user_agenda_bp
 from routes.userCalendarRoutes import user_calendar_bp
 from routes.facesRoutes import face_bp
@@ -38,6 +39,7 @@ app.register_blueprint(user_calendar_bp, url_prefix='/usercalendar')
 app.register_blueprint(face_bp, url_prefix='/faces')
 app.register_blueprint(notification_bp, url_prefix='/notifications')
 app.register_blueprint(user_contacts_bp, url_prefix='/usercontacts')
+app.register_blueprint(user_memories_bp, url_prefix='/memories')
 app.register_blueprint(user_face_bp, url_prefix='/userfaces')
 app.register_blueprint(events_bp, url_prefix='/events')
 # app.register_blueprint(ALZhemer, url_prefix='/Alzahemer')
