@@ -1,16 +1,12 @@
 import os
-from tkinter import Image
-from urllib import response
 import face_recognition as fr
 import cv2
 import numpy as np
 import os
-from flask import Flask, request, jsonify,Response, Blueprint
-from flask import Flask, render_template, request
-import pandas as pd
+from flask import  request, jsonify, Blueprint
 import cv2
 import numpy as np
-from werkzeug.utils import secure_filename
+
 
 
 FaceRecognation = Blueprint('Face', __name__)

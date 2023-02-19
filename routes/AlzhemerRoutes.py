@@ -1,14 +1,6 @@
-import os
-from tkinter import Image
-from urllib import response
+
 from MachineLearning.Alzahemer_Detection.Alzhemer import prediction
-from flask import Flask, request, jsonify,Response, Blueprint
-from flask import Flask, render_template, request
-import pandas as pd
-import cv2
-import numpy as np
-import base64
-from werkzeug.utils import secure_filename
+from flask import request, jsonify, Blueprint
 
 
 ALZhemer = Blueprint('Alzahemer', __name__)
