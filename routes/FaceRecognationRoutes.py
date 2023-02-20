@@ -69,7 +69,7 @@ def Recognation():
             cv2.putText(image, name, (left + 6, bottom - 6), font, 1.0, (255, 255, 255), 1)
 
      
-        cv2.imwrite("MachineLearning/Face_Recognation/output.jpg", image)
+        # cv2.imwrite("MachineLearning/Face_Recognation/output.jpg", image)
        
 
         return {"The Person is": name}
