@@ -63,10 +63,10 @@ def Recognation():
             
 
 
-        #     cv2.rectangle(image, (left, top), (right, bottom), (0, 0, 255), 2)
-        #     cv2.rectangle(image, (left, bottom - 15), (right, bottom), (0, 0, 255), cv2.FILLED)
-        #     font = cv2.FONT_HERSHEY_DUPLEX
-        #     cv2.putText(image, name, (left + 6, bottom - 6), font, 1.0, (255, 255, 255), 1)
+            cv2.rectangle(image, (left, top), (right, bottom), (0, 0, 255), 2)
+            cv2.rectangle(image, (left, bottom - 15), (right, bottom), (0, 0, 255), cv2.FILLED)
+            font = cv2.FONT_HERSHEY_DUPLEX
+            cv2.putText(image, name, (left + 6, bottom - 6), font, 1.0, (255, 255, 255), 1)
 
      
         # cv2.imwrite("MachineLearning/Face_Recognation/output.jpg", image)
