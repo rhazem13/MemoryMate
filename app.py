@@ -9,7 +9,7 @@ from models.db import db
 from middlewares.SocketAuth import *
 from routes.userRoutes import user_bp
 from routes.userLocationRoutes import user_location_bp
-from routes.memoriesRoutes import user_memories_bp
+from routes.memoriesroutes import user_memories_bp
 from routes.userAgendaRoutes import user_agenda_bp
 from routes.userCalendarRoutes import user_calendar_bp
 from routes.notificationRoutes import notification_bp
