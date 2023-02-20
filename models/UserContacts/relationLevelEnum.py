@@ -1,5 +1,5 @@
 from enum import Enum
 
 class ERelationLevel(Enum):
-    First = 0
-    Second = 1
+    basic = 0
+    close = 1

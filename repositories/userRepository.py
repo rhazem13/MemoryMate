@@ -8,7 +8,6 @@ from models.UserContacts.userContactsModel import UserContacts
 from models.Memories.caregiversMemoriesModel import CaregiverMemory
 from models.Memories.memoryPicsModel import MemoPictures
 from models.Memories.userMemoriesModel import Memory
-from models.Faces.facesModel import FacesModel
 from models.UserAgenda.userAgendaModel import UserAgenda
 from models.UserCalendar.userCalendarModel import UserCalendarModel
 from models.UserContacts.userContactsModel import UserContacts
@@ -16,6 +15,9 @@ from models.UserFaces.userfacesModel import UserfacesModel
 from repositories.repository import Repository
 from sqlalchemy.orm import load_only
 from sqlalchemy import func
+from repositories.contactsRepository import ContactsRepository
+
+contactsRepository = ContactsRepository
 
 class UserRepository(Repository):
    def __init__(self):
@@ -44,4 +46,12 @@ class UserRepository(Repository):
 
    def get_attr(id, attr):
       users = session.query(SomeModel).options(load_only(*fields)).all()
+   
+   def get_patients_by_caregiver_id(self, id):
+      result = contactsRepository.get_patients_ids(id)
+      idlist = [sublist[0] for sublist in result]
+      patients = User.query.with_entities(User.username,User.firstname,User.lastname,User.user_type,User.address,User.phone,
+      User.password,User.date_of_birth,User.email,
+      func.ST_AsGeoJSON(func.ST_Envelope(User.location)).label('location')).filter(User.id.in_(idlist)).all()
+      return patients
 

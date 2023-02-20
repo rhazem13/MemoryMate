@@ -46,19 +46,6 @@ client = Client(TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN)
 
 
 
-""" user_put_args = reqparse.RequestParser()
-
-user_put_args.add_argument("username", type=str, help="email")
-user_put_args.add_argument("password", type=str, help="password")
-user_put_args.add_argument("password", type=str, help="firstname")
-user_put_args.add_argument("password", type=str, help="lastname")
-user_put_args.add_argument("password", type=str, help="date_of_birth")
-user_put_args.add_argument("password", type=str, help="address")
-user_put_args.add_argument("password", type=str, help="type")
- """
-
-
-
 @user_bp.get('/currentusertest')
 @token_required
 def get(current_user):
@@ -68,11 +55,6 @@ def get(current_user):
     return {'message': 'the user is a caregiver'}
   else:
     return Response(status=403)  
-
-
-
-
-
 
 ALLOWED_EXTENSIONS = {'txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'}
 def allowed_file(filename):
