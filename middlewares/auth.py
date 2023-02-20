@@ -19,10 +19,10 @@ def token_required(f):
             print(token)
             data = jwt.decode(token,'secret', algorithms=['HS256'])
             print("ok")
-            current_user = User.query.filter_by(id=data['id']).first()       
+            request.current_user = User.query.filter_by(id=data['id']).first()       
         except:
             return jsonify({'message' : 'you are not supposed to be here!'}), 401
 
-        return f(current_user,*args, **kwargs)
+        return f(*args, **kwargs)
 
     return decorated
