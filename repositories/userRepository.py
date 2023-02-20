@@ -8,7 +8,6 @@ from models.UserContacts.userContactsModel import UserContacts
 from models.Memories.caregiversMemoriesModel import CaregiverMemory
 from models.Memories.memoryPicsModel import MemoPictures
 from models.Memories.userMemoriesModel import Memory
-from models.Faces.facesModel import FacesModel
 from models.UserAgenda.userAgendaModel import UserAgenda
 from models.UserCalendar.userCalendarModel import UserCalendarModel
 from models.UserContacts.userContactsModel import UserContacts
