@@ -1,7 +1,7 @@
 import json
 from marshmallow import Schema,fields,ValidationError,validates
 from repositories.userRepository import UserRepository
-from models.user.userTypeEnum import EUserType
+from models.User.userTypeEnum import EUserType
 from geoalchemy2.shape import to_shape
 from geojson import geometry
 from geoalchemy2 import Geometry
@@ -21,6 +21,7 @@ class UserLocationSchema(Schema):
     def get_geom(self, obj):
         # print(wkb.loads(bytes(obj.geom)))
         # print(to_shape(obj.geom))
+        print(obj.geom)
         return json.loads(obj.geom)
 
     def load_geom(self, obj):

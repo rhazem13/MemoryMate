@@ -8,6 +8,6 @@ __pycache__/
 *.so
 .Python
 *.log
-node_modules
-*/*.png
 *.jpg
+*.png
+node_modules
