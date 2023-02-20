@@ -1,4 +1,5 @@
 from models.Memories.userMemoriesModel import MemoryModel
+from models.user.userModel import User
 from repositories.repository import Repository
 from sqlalchemy import func
 from models.db import db
@@ -29,7 +30,7 @@ class MemoryRepository(Repository):
         return old_value
 
    def delete(self,id):
-        old_value = self.repoModel.query.get(id)
+        old_value = MemoryModel.query.get(id)
         if old_value is None:
             return False
         db.session.delete(old_value)
@@ -37,6 +38,7 @@ class MemoryRepository(Repository):
         return True
 
 
-   def get_by_id(self,id):
+   def get_by_id(id):
         result = MemoryModel.query.get(id)
         return result
+   
