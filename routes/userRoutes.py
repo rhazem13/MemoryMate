@@ -1,7 +1,7 @@
 from flask import Flask, request, Blueprint,jsonify,make_response,session
 from flask_restful import Resource, reqparse, abort
 from flask_bcrypt import generate_password_hash,check_password_hash
-from models.user.userModel import User
+from models.User.userModel import User
 from repositories.userRepository import UserRepository
 from middlewares.validation.userValidation import *
 from repositories.userRepository import UserRepository
@@ -27,6 +27,7 @@ user_bp = Blueprint('users', __name__)
 cache = CacheService.get_instance()
 emitter = EventEmitter.getInstance()
 create_user_schema = CreateUserscheme()
+locationschema = CreateUserscheme(many=True)
 login_user_schema = LoginUserscheme()
 codetoEmailSend_validation_schema = CreateResetPasswordEmailSendInputSchema()
 verify_validation_schema=VerifyEmailaddress()
@@ -42,6 +43,34 @@ TWILIO_AUTH_TOKEN= os.environ.get('TWILIO_AUTH_TOKEN')
 VERIFY_SERVICE_SID= os.environ.get('VERIFY_SERVICE_SID')
 
 client = Client(TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN)
+
+
+
+""" user_put_args = reqparse.RequestParser()
+
+user_put_args.add_argument("username", type=str, help="email")
+user_put_args.add_argument("password", type=str, help="password")
+user_put_args.add_argument("password", type=str, help="firstname")
+user_put_args.add_argument("password", type=str, help="lastname")
+user_put_args.add_argument("password", type=str, help="date_of_birth")
+user_put_args.add_argument("password", type=str, help="address")
+user_put_args.add_argument("password", type=str, help="type")
+ """
+
+
+
+@user_bp.get('/currentusertest')
+@token_required
+def get(current_user):
+  if  current_user.user_type=="PATIENT":
+    return {'message': 'the user is a patient'}
+  elif current_user.user_type=="CAREGIVER":
+    return {'message': 'the user is a caregiver'}
+  else:
+    return Response(status=403)  
+
+
+
 
 
 
@@ -225,3 +254,8 @@ def newpass():
 #        if len(number)<8:
 #          number=number+str(random(8-len(number)))
 #        return number[:8]
+@user_bp.get('/closefriendslocations/<int:id>')
+def get_close_friends_locations(id):
+    users = userRepository.get_close_friends_locations(id)
+    # print(users) 
+    return locationschema.dump(users)

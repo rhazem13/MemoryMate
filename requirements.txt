@@ -42,3 +42,6 @@ typing_extensions==4.4.0
 urllib3==1.26.14
 Werkzeug==2.2.2
 yarg==0.1.9
+flask_bcrypt==1.0.1
+PyJWT==2.6.0
+Marshmallow==3.19.0

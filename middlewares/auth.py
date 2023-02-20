@@ -1,4 +1,4 @@
-from models.user.userModel import User
+from models.User.userModel import User
 from repositories.userRepository import UserRepository
 from flask import request, jsonify
 from functools import wraps

@@ -1,9 +1,8 @@
-from marshmallow.validate import Length,OneOf,Regexp,URL
+from marshmallow.validate import Length,OneOf,Regexp
 from marshmallow import Schema, fields, validates, ValidationError
 import datetime
 import werkzeug
-
-
+import json
 
 user_types=['PATIENT','CAREGIVER']
 #Minimum eight characters, at least one letter, one number and one special character:
@@ -12,11 +11,13 @@ pass_regex=r"^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&)])[A-Za-z\d@$!%*#?&)]{8,}$"
 phone_regex=r"^\+[1-9]{1}[0-9]{3,14}$"
 channels=['sms','call','whatsapp']
 
-
 class CreateUserscheme(Schema):
-    username = fields.Str(required=True, validate=Length(min=3,max=60))
+    class Meta:
+        fields = ("username","firstname","lastname","location","email","password","file","user_type","address","phone","date_of_birth")
+    username = fields.Str(required=True, validate=Length(min=3,max=60)) 
     firstname=fields.Str(required=True,validate=Length(min=3,max=60))
     lastname=fields.Str(required=True,validate=Length(min=3,max=60))
+    location = fields.Method("get_location", deserialize="load_location")
     email=fields.Email(required=True)
     password=fields.Str(required=True,validate=Regexp(pass_regex))
     file =fields.Raw(type=werkzeug.datastructures.FileStorage) 
@@ -30,7 +31,12 @@ class CreateUserscheme(Schema):
         now = datetime.datetime.now().date()
         if value > now:
             raise ValidationError("Can't be born in the future!")
-
+    def get_location(self, obj):
+        if(obj.location==None):
+            return None
+        return json.loads(obj.location)
+    def load_location(self, obj):
+        return obj
 class LoginUserscheme(Schema):
      email=fields.Email(required=True)
      password=fields.Str(required=True,validate=Regexp(pass_regex))
@@ -48,3 +54,7 @@ class VerifyEmailaddress(Schema):
 class ResetPasswordInputSchema(Schema):
     # the 'required' argument ensures the field exists
     password = fields.Str(required=True,validate=Regexp(pass_regex))
+    email=fields.Email(required=True)
+    password=fields.Str(required=True,validate=Regexp(pass_regex))
+class Memoryscheme(Schema):
+    thumbnail =fields.Str() 

@@ -1,10 +1,9 @@
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
-from models.user.userTypeEnum import EUserType
+from models.User.userTypeEnum import EUserType
 from models.db import db
-from models.UserLocations import userLocationsModel
-from models.Notifications import notificationsModel
+from geoalchemy2 import Geometry
 
 class User(db.Model):
     __tablename__ = "user"
@@ -23,9 +22,4 @@ class User(db.Model):
                         server_default=func.now())
     locations = relationship('UserLocationModel')
     notifications = relationship('NotificationsModel')
-
-
-
-
-
-
+    location = db.Column(Geometry('POINT'))
