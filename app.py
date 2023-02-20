@@ -6,6 +6,7 @@ from flask_migrate import Migrate
 from services.caching.caching import CacheService
 from dotenv import load_dotenv
 from models.db import db
+from middlewares.SocketAuth import *
 from routes.userRoutes import user_bp
 from routes.userLocationRoutes import user_location_bp
 from routes.userAgendaRoutes import user_agenda_bp
