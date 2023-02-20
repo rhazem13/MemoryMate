@@ -24,4 +24,5 @@ class User(db.Model):
                         server_default=func.now())
     locations = relationship('UserLocationModel')
     notifications = relationship('NotificationsModel')
-    location = db.Column(Geometry('POINT'))
+    memories=relationship('MemoryModel', lazy=True)
+    # location = db.Column(Geometry('POINT'))

@@ -7,11 +7,13 @@ from models.UserContacts.userContactsModel import UserContacts
 #To do : change this to db file and export them
 from models.Memories.caregiversMemoriesModel import CaregiverMemory
 from models.Memories.memoryPicsModel import MemoPictures
-from models.Memories.userMemoriesModel import Memory
+from models.Memories.userMemoriesModel import MemoryModel
+from models.UserFaces.userfacesModel import UserfacesModel
 from models.UserAgenda.userAgendaModel import UserAgenda
 from models.UserCalendar.userCalendarModel import UserCalendarModel
 from models.UserContacts.userContactsModel import UserContacts
 from models.UserFaces.userfacesModel import UserfacesModel
+from models.User.userTypeEnum import EUserType
 from repositories.repository import Repository
 from sqlalchemy.orm import load_only
 from sqlalchemy import func
@@ -43,6 +45,9 @@ class UserRepository(Repository):
    def get_by_email(self,email):
       result = User.query.filter_by(email = email).first()
       return result
+   def get_by_id(self,id):
+        result = User.query.get(id)
+        return result
 
    def get_attr(id, attr):
       users = session.query(SomeModel).options(load_only(*fields)).all()
