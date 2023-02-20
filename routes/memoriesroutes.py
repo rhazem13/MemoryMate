@@ -77,8 +77,7 @@ def getmemo(current_user,memo_id):
 
          return {'message' : ' memory  not found for the current user!'}
 
-
-    return memoryManyschema.dump(memo)
+    return memoryschema.dump(memo)
 
 
 @user_memories_bp.patch('memopatch/<memo_id>')
