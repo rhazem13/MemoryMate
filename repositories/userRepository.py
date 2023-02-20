@@ -13,7 +13,6 @@ from models.UserAgenda.userAgendaModel import UserAgenda
 from models.UserCalendar.userCalendarModel import UserCalendarModel
 from models.UserContacts.userContactsModel import UserContacts
 from models.UserFaces.userfacesModel import UserfacesModel
-from models.User.userTypeEnum import EUserType
 from repositories.repository import Repository
 from sqlalchemy.orm import load_only
 from sqlalchemy import func
