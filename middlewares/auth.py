@@ -1,4 +1,5 @@
 import os
+from models.User.userModel import User
 from repositories.userRepository import UserRepository
 from flask import request, jsonify
 from functools import wraps
@@ -18,6 +19,8 @@ def token_required(f):
         try: 
             print(token)
             data = jwt.decode(token,os.environ['JWT_SECRET_KEY'], algorithms=['HS256'])
+            print("ok")
+            request.current_user = User.query.filter_by(id=data['id']).first()       
         except:
             return jsonify({'message' : 'you are not supposed to be here!'}), 401
 

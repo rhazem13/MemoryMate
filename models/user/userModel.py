@@ -4,6 +4,8 @@ from sqlalchemy.sql import func
 from models.User.userTypeEnum import EUserType
 from models.db import db
 from geoalchemy2 import Geometry
+from models.User.userTypeEnum import EUserType
+from sqlalchemy import Enum
 
 class User(db.Model):
     __tablename__ = "user"
@@ -14,7 +16,7 @@ class User(db.Model):
     email = db.Column(db.String(80), unique=True, nullable=False)
     password = db.Column(db.String(128))
     photo_path = db.Column(db.Text())
-    user_type = db.Column(db.String(20), nullable=False)
+    user_type = db.Column(Enum(EUserType))
     address = db.Column(db.String(100), nullable=False)
     phone = db.Column(db.String(20), nullable=False)
     date_of_birth = db.Column(db.Date, nullable=True)
