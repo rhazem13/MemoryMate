@@ -55,7 +55,7 @@ app.register_blueprint(user_face_bp, url_prefix='/userfaces')
 app.register_blueprint(events_bp, url_prefix='/events')
 #app.register_blueprint(ALZhemer, url_prefix='/Alzahemer')
 #app.register_blueprint(FaceRecognation, url_prefix='/Face')
-
+socket_clients = dict()
 socketio = SocketIO(app, cors_allowed_origins='*')
 emitter = EventEmitter.getInstance()
 
@@ -68,13 +68,16 @@ def notify_patients_drugs():
         for agenda in agendas:
             print(agenda)
             id = agenda.id
+            if redis_client.get(f"agenda-{id}"):
+                continue
             redis_client.set(f"agenda-{id}", "False")
             user_id = agenda.user_id
             notification = {
                 "user_id": user_id,
                 "title": "لقد نسيت أخذ الدواء",
                 "body": {
-                    "content": "لقد نسيت اخذ دواء الساعة 7"
+                    "content": "لقد نسيت اخذ دواء الساعة 7",
+                    "agenda_id":agenda.id
                 },
                 "type": "important"
             }
@@ -96,7 +99,8 @@ def notify_patients_drugs():
                     "user_id": caregiver_id,
                     "title": "قريبك مخدش الدوا",
                     "body": {
-                        "content": "قريبك نسي ياخد الدوا"
+                        "content": "قريبك نسي ياخد الدوا",
+                        "agenda_id":agenda.id
                     },
                     "type": "important"
                 })
@@ -111,14 +115,16 @@ atexit.register(lambda: scheduler.shutdown())
 def notify_user(user_id, notification):
     print('notification for user ', user_id, notification)
     NotificationsRepository().create(notification)
-    socketio.emit('agenda-notify', {"content": "hiiiiiii"})
+    socketio.emit('agenda-notify', notification, room = socket_clients[user_id])
     print('emit for user')
 
 
 @socketio.on('connect')
 @token_required
-def test_connect(cur_user):
+def test_connect(cur_user): 
+    print('connected, ', request.sid)
     user_id = cur_user.id
+    socket_clients[user_id] = request.sid
     emitter.on(f'notify_user-{user_id}', notify_user)
 
 
@@ -126,9 +132,10 @@ def test_connect(cur_user):
 @socketio.on('reminded')
 @token_required
 def agenda_reminded(cur_user, data):
-    print(data)
+    print('reminded, ', request.sid)
     agenda_id = data['agenda_id']
     redis_client.delete(f"agenda-{agenda_id}")
+    UserAgendaRepository.updateAgendaStartTimeWithInterval(data['agenda_id'])
     print('user getting reminded')
 
 # testing emitter,, hazem

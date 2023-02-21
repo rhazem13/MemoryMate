@@ -14,6 +14,7 @@ socket.on ('test connect', function(connectMsg) {
 $('#log').append('<br>' + $('<div/>').text('What is the intention of the code: ' + connectMsg.data).html());
 });
 socket.on('agenda-notify',data=>{
+    console.log(data)
     let confirm = window.confirm("your patient forgot his pills")
 
 })

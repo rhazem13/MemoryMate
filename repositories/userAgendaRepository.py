@@ -21,3 +21,9 @@ class UserAgendaRepository(Repository):
         print('in update function ')
         UserAgenda.query.filter(UserAgenda.start_time<func.now()).update({UserAgenda.start_time:UserAgenda.start_time+UserAgenda.repeat_interval})
         db.session.commit()
+    
+    def updateAgendaStartTimeWithInterval(id):
+        UserAgenda.query.filter(UserAgenda.id == id).update({UserAgenda.start_time:UserAgenda.start_time+UserAgenda.repeat_interval})
+        db.session.commit()
+
+    

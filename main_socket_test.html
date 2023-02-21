@@ -14,9 +14,10 @@ socket.on ('test connect', function(connectMsg) {
 $('#log').append('<br>' + $('<div/>').text('What is the intention of the code: ' + connectMsg.data).html());
 });
 socket.on('agenda-notify',data=>{
+    console.log(data)
     let confirm = window.confirm("don't forget your pills")
     if (confirm){
-        socket.emit('reminded',{agenda_id:1})
+        socket.emit('reminded',{agenda_id:data.body.agenda_id})
     }
 
 })
