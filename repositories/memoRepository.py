@@ -10,18 +10,18 @@ class MemoryRepository(Repository):
         super().__init__(MemoryModel)
 
    def create(self,value):
-        new_value = self.repoModel(**value)
+        new_value = MemoryModel(**value)
         db.session.add(new_value)
         db.session.commit()
         db.session.refresh(new_value)
         return new_value
 
    def get_all(self):
-        result = self.repoModel.query.all()
+        result = MemoryModel.query.all()
         return result
 
    def update(self,new_value,id):
-        old_value = self.repoModel.query.get(id)
+        old_value = MemoryModel.query.get(id)
         if old_value is None:
             return False
         for key, value in new_value.items():
