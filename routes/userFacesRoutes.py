@@ -1,9 +1,10 @@
-from flask import request, Blueprint
+from flask import jsonify, request, Blueprint
 from flask_restful import abort
 from repositories.userFacesRepository import UserfacesRepository
 from middlewares.validation.userFacesValidation import UserFacesSchema
 from middlewares.auth import token_required
-
+from routes.userRoutes import allowed_file
+from werkzeug.utils import secure_filename
 user_face_bp = Blueprint('userface', __name__)
 manySchema=UserFacesSchema(many=True)
 singleSchema=UserFacesSchema()
@@ -16,46 +17,42 @@ def post():
     if errors:
         return errors, 422
     payload =UserFacesSchema().load(request.json)
-    if('id' in payload):
-        return "Id field shouldn't be entered",422
-    return singleSchema.dump(facesRepository.create(payload))
-
-""" def post():
-    errors= singleSchema.validate(request.form)
-    if errors:
-        return errors, 422
     
-
-    payload =FacesSchema().load(request.form)
-    print("found")
-
     if('id' in payload):
         return "Id field shouldn't be entered",422
     
-    if 'user_face' not in request.files:
-        resp=jsonify({'message' : 'No  image  in the request'})
+    if 'file' not in request.files:
+        resp = jsonify({'message':'No file part in the request'})
         resp.status_code=400
         return resp
-    user_face = request.files['user_face']
-    if user_face.filename=='':
+    pic =request.files['file']
+
+    if pic.filename=='':
         resp=jsonify({'message' : 'No image selected for uploading'})
         resp.status_code=400
         return resp
-    if user_face and allowed_file(user_face.filename):
-         
-     user_face_name = secure_filename(user_face.filename)
-     user_face_path =  "static/faces/" + user_face_name
-     user_face.save(user_face_path)
+    if pic and allowed_file(pic.filename):
+         user_face_name = secure_filename(pic.filename)
+         img_path =  "MachineLearning/Face_Recognation/train/" + user_face_name
+         pic.save(img_path)
 
-     payload['']=user_face_path #######add column name here
-     resp=jsonify({'message' : 'face uploaded suecessfully'})
-     resp.status_code=201
-     return singleSchema.dump(faceRepository.create(payload))
-
+         payload['face_url']=img_path 
+         resp=jsonify({'message' : 'face uploaded suecessfully'})
+         resp.status_code=201
+    # return singleSchema.dump(faceRepository.create(payload))
+    ##  img_path =  "MachineLearning/Face_Recognation/train/" + pic.filename
+        
+    # pic.save(img_path)    
+         return singleSchema.dump(facesRepository.create(payload))
     else:
      resp = jsonify({'message' : 'Allowed file types are txt, pdf, png, jpg, jpeg, gif'})
      resp.status_code=400
-     return resp """
+     return resp 
+
+
+
+
+
 
 @user_face_bp.get('')
 @token_required
