@@ -22,7 +22,7 @@ def post():
         return "Id field shouldn't be entered",422
     
     if('user_id' in payload):
-        return "Id field shouldn't be entered",422
+        return "user_id should be entered",422
     if 'file' not in request.files:
         resp = jsonify({'message':'No file part in the request'})
         resp.status_code=400
