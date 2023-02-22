@@ -21,21 +21,23 @@ def post():
     if('id' in payload):
         return "Id field shouldn't be entered",422
     
-    if('user_id' in payload):
+    if('user_id' not in payload):
         return "user_id should be entered",422
     if 'file' not in request.files:
         resp = jsonify({'message':'No file part in the request'})
         resp.status_code=400
         return resp
+
     pic =request.files['file']
 
     if pic.filename=='':
         resp=jsonify({'message' : 'No image selected for uploading'})
         resp.status_code=400
         return resp
+
     if pic and allowed_file(pic.filename):
          user_face_name = secure_filename(pic.filename)
-         img_path =  "MachineLearning/Face_Recognation/train/" + user_face_name
+         img_path =  "Static/Faces/${user_id}/" + user_face_name
          pic.save(img_path)
 
          payload['face_url']=img_path 
