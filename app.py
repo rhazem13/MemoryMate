@@ -23,6 +23,8 @@ from services.EventEmitter.event_emitter import EventEmitter
 from repositories.userAgendaRepository import UserAgendaRepository
 from services.redis.redis import RedisService
 from middlewares.auth import token_required
+from events.agenda.CaregiverAgendaEvent import CaregiverAgendaEvent
+from events.agenda.PatientAgendaEvent import PatientAgendaEvent
 import time
 import atexit
 
@@ -72,17 +74,8 @@ def notify_patients_drugs():
                 continue
             redis_client.set(f"agenda-{id}", "False")
             user_id = agenda.user_id
-            notification = {
-                "user_id": user_id,
-                "title": "لقد نسيت أخذ الدواء",
-                "body": {
-                    "content": "لقد نسيت اخذ دواء الساعة 7",
-                    "agenda_id":agenda.id
-                },
-                "type": "important"
-            }
-            print(emitter._callbacks)
-            emitter.emit(f"notify_user-{user_id}", user_id,  notification)
+            PatientAgendaEvent().notify(None, user_id, f"notify_user-{user_id}",{"agenda_id":agenda.id})
+            print('callbacks of emitters ', emitter._callbacks)
         expired_agendas = UserAgendaRepository.getExpiredAgenda()
         # UserAgendaRepository.updateStartTimeWithInterval()
         print('expired_agendas are',expired_agendas)
@@ -104,6 +97,8 @@ def notify_patients_drugs():
                     },
                     "type": "important"
                 })
+                redis_client.delete(f"agenda-{agenda_id}")
+        UserAgendaRepository.updateStartTimeWithInterval()
 
 
 
@@ -126,6 +121,7 @@ def test_connect(cur_user):
     user_id = cur_user.id
     socket_clients[user_id] = request.sid
     emitter.on(f'notify_user-{user_id}', notify_user)
+    print('emitters in connect', emitter._callbacks)
 
 
 
@@ -137,6 +133,10 @@ def agenda_reminded(cur_user, data):
     redis_client.delete(f"agenda-{agenda_id}")
     UserAgendaRepository.updateAgendaStartTimeWithInterval(data['agenda_id'])
     print('user getting reminded')
+
+@socketio.on('disconnect')
+def disconnect():
+    print('disconnecting')
 
 # testing emitter,, hazem
 
@@ -151,6 +151,6 @@ emitter.on('update-location', update_location())
 #     db.create_all()
 
 
-app.run(debug=True)
+app.run(debug=True, use_reloader=False)
 print('starting socket')
 #socketio.run(app, debug = True, host='127.0.0.1')
