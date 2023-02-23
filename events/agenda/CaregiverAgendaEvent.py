@@ -1,5 +1,5 @@
 from events.Event import Event
-
+from services.socket.socket import SocketService
 
 class CaregiverAgendaEvent(Event):
 
@@ -12,3 +12,8 @@ class CaregiverAgendaEvent(Event):
             "content": "لقد نسيت اخذ الدواء",
             "agenda_id": args['agenda_id']
         }
+        return data
+    
+    def emit(notification, args):
+        socketio = SocketService.getSocket()
+        socketio.emit('agenda-notify', notification, room = args['room'])
