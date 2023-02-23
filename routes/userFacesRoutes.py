@@ -13,6 +13,7 @@ facesRepository= UserfacesRepository()
 @token_required
 def post():
     
+    user_id = request.current_user.id
     errors= singleSchema.validate(request.get_json())
     if errors:
         return errors, 422
@@ -23,6 +24,7 @@ def post():
     
     if('user_id' not in payload):
         return "user_id should be entered",422
+    
     
     if 'file' not in request.files:
         resp = jsonify({'message':'No file part in the request'})
@@ -38,10 +40,12 @@ def post():
 
     if pic and allowed_file(pic.filename):
          user_face_name = secure_filename(pic.filename)
-         img_path =  "Static/Faces/${user_id}/" + user_face_name
+         img_path =  "static/faces/{user_id}/" + user_face_name
          pic.save(img_path)
 
          payload['face_url']=img_path 
+
+         payload['user_id'] = user_id
          resp=jsonify({'message' : 'face uploaded suecessfully'})
          resp.status_code=201
     # return singleSchema.dump(faceRepository.create(payload))
