@@ -75,8 +75,7 @@ def notify_patients_drugs():
             agenda_id = agenda.id
             if redis_client.get(f"agenda-{agenda_id}") is None:
                 continue
-            caregivers = UserRepository.get_caregivers_by_patient_id(
-                agenda.user_id)
+            caregivers = UserRepository.get_caregivers_by_patient_id(agenda.user_id)
             for caregiver in caregivers:
                 caregiver_id = caregiver.id
                 CaregiverAgendaEvent().notify(None, caregiver_id, f"notify_user-{caregiver_id}", {
