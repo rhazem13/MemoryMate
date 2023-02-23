@@ -1,5 +1,5 @@
 from models.Memories.userMemoriesModel import MemoryModel
-from models.User.userModel import User
+from models.user.userModel import User
 from repositories.repository import Repository
 from sqlalchemy import func
 from models.db import db
@@ -21,7 +21,7 @@ class MemoryRepository(Repository):
         return result
 
    def update(self,new_value,id):
-        old_value = MemoryModel.query.get(id)
+        old_value =MemoryModel.query.get(id)
         if old_value is None:
             return False
         for key, value in new_value.items():
