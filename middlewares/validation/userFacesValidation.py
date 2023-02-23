@@ -1,11 +1,10 @@
 from marshmallow import Schema,fields,ValidationError,validates,validate
 from repositories.userRepository import UserRepository
-from repositories.facesRepository import FacesRepository
 class UserFacesSchema(Schema):
     class Meta:
-        fields = ("id","user_id","face_id","name","bio")
+        fields = ("id","user_id","face_url","name","bio")
     user_id = fields.Integer(required=True)
-    face_id = fields.Integer(required=True)
+    face_url = fields.String(required=True)
     name = fields.String(required=True)
     bio = fields.String(required=True)
 
