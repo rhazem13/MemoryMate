@@ -45,7 +45,6 @@ VERIFY_SERVICE_SID = os.environ.get('VERIFY_SERVICE_SID')
 
 client = Client(TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN)
 
-
 @user_bp.get('/currentusertest')
 @token_required
 def get():
@@ -72,7 +71,6 @@ def register():
     if errors:
         return errors, 422
     payload = create_user_schema.load(request.json)
-
     hashed_password = generate_password_hash(
         payload['password']).decode('utf-8')
     payload['password'] = hashed_password
