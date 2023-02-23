@@ -59,7 +59,6 @@ def notify_patients_drugs():
         print(time.strftime("%A, %d. %B %Y %I:%M:%S %p"))
         agendas = UserAgendaRepository.findWithenInterval(5)
         for agenda in agendas:
-            print(agenda)
             id = agenda.id
             if redis_client.get(f"agenda-{id}"):
                 continue
@@ -68,16 +67,13 @@ def notify_patients_drugs():
             PatientAgendaEvent().notify(None, user_id,
                                         f"notify_user-{user_id}", {"agenda_id": agenda.id, "room": socket_clients[user_id]})
         expired_agendas = UserAgendaRepository.getExpiredAgenda()
-        # UserAgendaRepository.updateStartTimeWithInterval()
-        print('expired_agendas are', expired_agendas)
+        UserAgendaRepository.updateStartTimeWithInterval()
         for agenda in expired_agendas:
             agenda_id = agenda.id
             if redis_client.get(f"agenda-{agenda_id}") is None:
                 continue
-
             caregivers = UserRepository.get_caregivers_by_patient_id(
                 agenda.user_id)
-            print(caregivers)
             for caregiver in caregivers:
                 caregiver_id = caregiver.id
                 CaregiverAgendaEvent().notify(None, caregiver_id, f"notify_user-{caregiver_id}", {
@@ -94,27 +90,18 @@ atexit.register(lambda: scheduler.shutdown())
 
 @socketio.on('connect')
 @token_required
-def test_connect(cur_user):
-    print('connected, ', request.sid)
+def on_connect():
+    cur_user = request.current_user
     user_id = cur_user.id
     socket_clients[user_id] = request.sid
-    print('emitters in connect', emitter._callbacks)
 
 
 @socketio.on('reminded')
 @token_required
-def agenda_reminded(cur_user, data):
-    print('reminded, ', request.sid)
+def agenda_reminded(data):
     agenda_id = data['agenda_id']
     redis_client.delete(f"agenda-{agenda_id}")
     UserAgendaRepository.updateAgendaStartTimeWithInterval(data['agenda_id'])
-    print('user getting reminded')
-
-
-@socketio.on('disconnect')
-def disconnect():
-    print('disconnecting')
-
 
 app.run(debug=True, use_reloader=False)
 print('starting socket')
