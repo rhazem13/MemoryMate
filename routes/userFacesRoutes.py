@@ -23,6 +23,7 @@ def post():
     
     if('user_id' not in payload):
         return "user_id should be entered",422
+    
     if 'file' not in request.files:
         resp = jsonify({'message':'No file part in the request'})
         resp.status_code=400
