@@ -7,7 +7,7 @@ class Event:
         repo = NotificationsRepository()
         data = self.getData(sender_id, reciever_id, args)
         repo.create(data)
-        self.emit(data, channel)
+        self.emit(data, args)
 
     def emit(self, data, args=None):
         self.emitter.emit(data, args)

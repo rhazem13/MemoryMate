@@ -14,7 +14,7 @@ class PatientAgendaEvent(Event):
         }
         return data
 
-    def emit(notification, args):
+    def emit(self, notification, args):
         socketio = SocketService.getSocket()
         socketio.emit('agenda-notify', notification, room = args['room'])
 
