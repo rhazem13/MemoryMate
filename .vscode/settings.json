@@ -1,3 +1,4 @@
 {
-    "editor.indentSize": "tabSize"
+  "editor.indentSize": "tabSize",
+  "python.analysis.typeCheckingMode": "basic"
 }

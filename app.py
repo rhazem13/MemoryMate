@@ -71,7 +71,7 @@ emitter.on('update-location',update_location())
 # with app.app_context():
 #     db.create_all()
 
-
+print("ok")
 app.run(debug = True)
 print('starting socket')
 #socketio.run(app, debug = True, host='127.0.0.1')
