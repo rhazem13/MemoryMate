@@ -40,7 +40,7 @@ def post():
 
     if pic and allowed_file(pic.filename):
          user_face_name = secure_filename(pic.filename)
-         img_path =  "static/faces/{user_id}/" + user_face_name
+         img_path =  f"static/faces/{user_id}/" + user_face_name
          pic.save(img_path)
 
          payload['face_url']=img_path 
