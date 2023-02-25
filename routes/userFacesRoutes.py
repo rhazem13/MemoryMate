@@ -5,6 +5,7 @@ from middlewares.validation.userFacesValidation import UserFacesSchema
 from middlewares.auth import token_required
 from routes.userRoutes import allowed_file
 from werkzeug.utils import secure_filename
+import os
 user_face_bp = Blueprint('userface', __name__)
 manySchema=UserFacesSchema(many=True)
 singleSchema=UserFacesSchema()
@@ -14,16 +15,19 @@ facesRepository= UserfacesRepository()
 def post():
     
     user_id = request.current_user.id
-    errors= singleSchema.validate(request.get_json())
+    errors= singleSchema.validate(request.form)
+   
     if errors:
+        print("moamewn")
         return errors, 422
-    payload =UserFacesSchema().load(request.json)
+    payload =UserFacesSchema().load(request.form)
 
     if('id' in payload):
         return "Id field shouldn't be entered",422
     
-    if('user_id' not in payload):
-        return "user_id should be entered",422
+    
+    # if('user_id' not in payload):
+    #     return "user_id should be entered",422
     
     
     if 'file' not in request.files:
@@ -37,6 +41,8 @@ def post():
         resp=jsonify({'message' : 'No image selected for uploading'})
         resp.status_code=400
         return resp
+  
+    os.mkdir(f'static/faces/{user_id}')
 
     if pic and allowed_file(pic.filename):
          user_face_name = secure_filename(pic.filename)
