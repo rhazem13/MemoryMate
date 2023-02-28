@@ -104,7 +104,7 @@ def agenda_reminded(data):
     agenda_id = data['agenda_id']
     redis_client.delete(f"agenda-{agenda_id}")
     UserAgendaRepository.updateAgendaStartTimeWithInterval(data['agenda_id'])
-
-app.run(debug=True, use_reloader=False)
+if __name__ == '__main__':
+    app.run(host="0.0.0.0",debug=True, use_reloader=False)
 print('starting socket')
 #socketio.run(app, debug = True, host='127.0.0.1')
