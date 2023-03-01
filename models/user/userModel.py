@@ -4,12 +4,9 @@ from sqlalchemy.sql import func
 from models.User.userTypeEnum import EUserType
 from models.db import db
 from geoalchemy2 import Geometry
-<<<<<<< HEAD
 from models.Memories.caregiversMemoriesModel import CaregiverMemory
-=======
 from models.User.userTypeEnum import EUserType
 from sqlalchemy import Enum
->>>>>>> 9daca5f8d62aba96d1dd97eb6183e932060e7b93
 
 class User(db.Model):
     __tablename__ = "user"

@@ -96,7 +96,7 @@ def login():
     if check_password_hash(user.password, payload['password']):
         try:
             # , 'exp' : datetime.datetime.utcnow() + datetime.timedelta(minutes=30)
-            token = jwt.encode({'id': user.id}, 'REMOVED_SENSITIVE_VALUE')
+            token = jwt.encode({'id': user.id}, os.environ['JWT_SECRET_KEY'])
             return {'token': token}
         except ValidationError as err:
             print(err.messages)
@@ -162,7 +162,7 @@ def verify():
 
             if check.status == 'approved':
                 # , 'exp' : datetime.datetime.utcnow() + datetime.timedelta()
-                token = jwt.encode({'id': user.id}, 'REMOVED_SENSITIVE_VALUE')
+                token = jwt.encode({'id': user.id}, os.environ['JWT_SECRET_KEY'])
                 return jsonify({'token': token})
 
             else:
@@ -186,7 +186,7 @@ def newpass():
     elif not token:
         return {"message": "Token is required!"}
 
-    token = jwt.decode(token, 'REMOVED_SENSITIVE_VALUE', algorithms=['HS256'])
+    token = jwt.decode(token, os.environ['JWT_SECRET_KEY'], algorithms=['HS256'])
     user = User.query.filter_by(id=token['id']).first()
     if user is None:
         return{"message": "No record found with this email. please signup first"}
@@ -213,11 +213,6 @@ def newpass():
 def get_close_friends_locations(id):
 
     users = userRepository.get_close_friends_locations(id)
-<<<<<<< HEAD
     # print(users) 
     return locationschema.dump(users)
 
-=======
-    # print(users)
-    return locationschema.dump(users)
->>>>>>> 9daca5f8d62aba96d1dd97eb6183e932060e7b93
