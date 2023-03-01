@@ -1,6 +1,6 @@
 import os
 from repositories.userRepository import UserRepository
-from models.user.userModel import User
+from models.User.userModel import User
 from flask import request, jsonify
 from functools import wraps
 import jwt

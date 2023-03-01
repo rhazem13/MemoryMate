@@ -4,6 +4,7 @@ import os
 from werkzeug.utils import secure_filename
 from repositories.memoRepository import MemoryRepository
 from models.Memories.userMemoriesModel import MemoryModel
+from models.User.userModel import User
 from middlewares.validation.userMemoryValidation import MemorySchema
 from repositories.userRepository import UserRepository
 from middlewares.auth import token_required
@@ -20,11 +21,11 @@ def allowed_file(filename):
 
 @user_memories_bp.post('/memoadd')
 @token_required
-def post(current_user):
-    errors= MemorySchema().validate(request.form)
+def post(current_user): # add memory
+    errors= MemorySchema().validate(request.values)
     if errors:
         return errors, 422
-    payload =MemorySchema().load(request.form)
+    payload =MemorySchema().load(request.values)
     if not current_user.id==payload['user_id']:
         return {'message' : 'not a valid user'}
     
@@ -44,21 +45,27 @@ def post(current_user):
      thumbnail.save( thumbnail_path)
 
      payload['thumbnail']=thumbnail_path
-     memoryRepository.create(payload)
-     return MemorySchema().dump(memoryRepository.create(payload))
+     caregiver1=UserRepository().get_by_id(30)
+     caregiver2=UserRepository().get_by_id(32)
+     caregiver3=UserRepository().get_by_id(33)
+     payload['caregivers']=[30,33,32]
+     memory=memoryRepository.create(payload)
+     memory.caregivers=payload['caregivers']
+
+     return MemorySchema().dump(memory)
     else:
      resp = jsonify({'message' : 'Allowed file types are txt, pdf, png, jpg, jpeg, gif'})
      resp.status_code=400
      return resp
 
-@user_memories_bp.get('/memoesget')
+@user_memories_bp.get('/memoesget') #get all memories
 @token_required
 def getmemos(current_user):
  
      memos= memoryRepository.get_all()
      return memoryManyschema.dump(memos)
 
-@user_memories_bp.get('/usermemoget') #get memo of specific user
+@user_memories_bp.get('/usermemoget') #get memos of specific user
 @token_required
 def geUsermemos(current_user):
 
@@ -68,7 +75,7 @@ def geUsermemos(current_user):
 
     return memoryManyschema.dump(USERmemos)
 
-@user_memories_bp.get('/memoget/<memo_id>') #get memo of specific user
+@user_memories_bp.get('/memoget/<memo_id>') #get specific memo of specific user
 @token_required
 def getmemo(current_user,memo_id):
 
@@ -78,6 +85,17 @@ def getmemo(current_user,memo_id):
          return {'message' : ' memory  not found for the current user!'}
 
     return memoryschema.dump(memo)
+
+
+
+@user_memories_bp.get('/userget') #####get user info from memory
+@token_required
+def getuser(current_user):
+
+    memo = MemoryModel.query.filter_by( user_id=current_user.id).first()
+    usr=memo.patient.photo_path
+
+    return {"user photo is":usr}
 
 
 @user_memories_bp.patch('memopatch/<memo_id>')
@@ -107,6 +125,4 @@ def delete(current_user,memo_id):
     if(result):
         return {"the following memory id is deleted" :f"{memo.id}"}
     abort(404)
-
-
 
