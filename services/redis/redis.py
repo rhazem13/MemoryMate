@@ -10,5 +10,5 @@ class RedisService:
             port = current_app.config['CACHE_REDIS_PORT']
             password = current_app.config['CACHE_REDIS_PASSWORD']
             db = current_app.config['CACHE_REDIS_DB']
-            RedisService.redis_client = redis.Redis(host=host, port=port, db=db, password=password)
+            RedisService.redis_client = redis.Redis(host=host, port=port, db=db, password=password, decode_responses=True)
         return RedisService.redis_client
