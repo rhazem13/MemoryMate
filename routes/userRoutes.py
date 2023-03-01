@@ -75,3 +75,4 @@ def get_close_friends_locations(id):
     users = userRepository.get_close_friends_locations(id)
     # print(users) 
     return locationschema.dump(users)
+
