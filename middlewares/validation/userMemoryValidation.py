@@ -14,18 +14,9 @@ class MemorySchema(Schema):
     thumbnail=fields.URL()
     memo_date = fields.Date()
     user_id=fields.Int()
-    caregivers=fields.List(fields.Nested(userscheme()))
+    caregivers=fields.List(fields.Int())
     #memories=fields.List(fields.Nested(Schema()), dump_only=True)
-    @validates('memo_date')
-    def cant_make_memory_in_future (self,value):
-        """'value' is the datetime parsed from time_created by marshmasllow"""
-        now = datetime.datetime.now().date()
-        if value > now:
-            raise ValidationError("cant make memory in_future!")
-    @validates('user_id')
-    def validate_user(self,user_id):
-        if not UserRepository.get_by_id(self,user_id):
-            raise ValidationError ("not valid user")
+
     
         
 

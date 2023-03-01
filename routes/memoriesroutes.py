@@ -21,17 +21,14 @@ def allowed_file(filename):
 
 @user_memories_bp.post('/memoadd')
 @token_required
-<<<<<<< HEAD
-def post(current_user): # add memory
-    errors= MemorySchema().validate(request.values)
-=======
 def post():
     current_user = request.current_user
     errors= MemorySchema().validate(request.form)
->>>>>>> 9daca5f8d62aba96d1dd97eb6183e932060e7b93
+    
     if errors:
         return errors, 422
     payload =MemorySchema().load(request.values)
+    print(payload['caregivers'])
     if not current_user.id==payload['user_id']:
         return {'message' : 'not a valid user'}
     

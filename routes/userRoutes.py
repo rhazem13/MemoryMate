@@ -213,11 +213,6 @@ def newpass():
 def get_close_friends_locations(id):
 
     users = userRepository.get_close_friends_locations(id)
-<<<<<<< HEAD
     # print(users) 
     return locationschema.dump(users)
 
-=======
-    # print(users)
-    return locationschema.dump(users)
->>>>>>> 9daca5f8d62aba96d1dd97eb6183e932060e7b93
