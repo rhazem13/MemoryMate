@@ -27,6 +27,7 @@ from events.agenda.CaregiverAgendaEvent import CaregiverAgendaEvent
 from events.agenda.PatientAgendaEvent import PatientAgendaEvent
 import time
 import atexit
+import pickle
 from apscheduler.schedulers.background import BackgroundScheduler
 #from routes.AlzhemerRoutes import ALZhemer
 #from routes.FaceRecognationRoutes import FaceRecognation
@@ -52,7 +53,6 @@ app.register_blueprint(events_bp, url_prefix='/events')
 app.register_blueprint(caring_bp, url_prefix='/caring')
 #app.register_blueprint(ALZhemer, url_prefix='/Alzahemer')
 #app.register_blueprint(FaceRecognation, url_prefix='/Face')
-socket_clients = dict()
 socketio = SocketService.getSocket(app)
 emitter = EventEmitter.getInstance()
 
@@ -68,7 +68,7 @@ def notify_patients_drugs():
             redis_client.set(f"agenda-{id}", "False")
             user_id = agenda.user_id
             PatientAgendaEvent().notify(None, user_id,
-                                        f"notify_user-{user_id}", {"agenda_id": agenda.id, "room": socket_clients[user_id]})
+                                        f"notify_user-{user_id}", {"agenda_id": agenda.id, "room": redis_client.get(user_id)})
         expired_agendas = UserAgendaRepository.getExpiredAgenda()
         UserAgendaRepository.updateStartTimeWithInterval()
         for agenda in expired_agendas:
@@ -79,7 +79,7 @@ def notify_patients_drugs():
             for caregiver in caregivers:
                 caregiver_id = caregiver.id
                 CaregiverAgendaEvent().notify(None, caregiver_id, f"notify_user-{caregiver_id}", {
-                    "agenda_id": agenda.id, "room": socket_clients[caregiver_id]})
+                    "agenda_id": agenda.id, "room": redis_client.get(user_id)})
                 redis_client.delete(f"agenda-{agenda_id}")
         UserAgendaRepository.updateStartTimeWithInterval()
 
@@ -89,13 +89,14 @@ scheduler.add_job(func=notify_patients_drugs, trigger="interval", seconds=60)
 scheduler.start()
 atexit.register(lambda: scheduler.shutdown())
 
-
 @socketio.on('connect')
 @token_required
 def on_connect():
     cur_user = request.current_user
     user_id = cur_user.id
-    socket_clients[user_id] = request.sid
+    redis_client.set(user_id, request.sid)
+    print("user ",{cur_user}," with id",user_id, "connected")
+
 
 
 @socketio.on('reminded')
