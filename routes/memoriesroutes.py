@@ -21,8 +21,14 @@ def allowed_file(filename):
 
 @user_memories_bp.post('/memoadd')
 @token_required
+<<<<<<< HEAD
 def post(current_user): # add memory
     errors= MemorySchema().validate(request.values)
+=======
+def post():
+    current_user = request.current_user
+    errors= MemorySchema().validate(request.form)
+>>>>>>> 9daca5f8d62aba96d1dd97eb6183e932060e7b93
     if errors:
         return errors, 422
     payload =MemorySchema().load(request.values)
@@ -60,15 +66,15 @@ def post(current_user): # add memory
 
 @user_memories_bp.get('/memoesget') #get all memories
 @token_required
-def getmemos(current_user):
+def getmemos():
  
      memos= memoryRepository.get_all()
      return memoryManyschema.dump(memos)
 
 @user_memories_bp.get('/usermemoget') #get memos of specific user
 @token_required
-def geUsermemos(current_user):
-
+def geUsermemos():
+    current_user = request.current_user
     USERmemos = MemoryModel.query.filter_by(user_id=current_user.id).all()
     if not USERmemos:
                 return jsonify({'message' : 'No memory found!'})
@@ -77,8 +83,8 @@ def geUsermemos(current_user):
 
 @user_memories_bp.get('/memoget/<memo_id>') #get specific memo of specific user
 @token_required
-def getmemo(current_user,memo_id):
-
+def getmemo(memo_id):
+    current_user = request.current_user
     memo = MemoryModel.query.filter_by(id=memo_id, user_id=current_user.id).first()
     if not memo:
 
@@ -100,7 +106,8 @@ def getuser(current_user):
 
 @user_memories_bp.patch('memopatch/<memo_id>')
 @token_required
-def patch(current_user,memo_id):
+def patch(memo_id):
+    current_user = request.current_user
     errors= memoryschema.validate(request.form,partial=True)
     if errors:
         return errors, 422
@@ -116,8 +123,8 @@ def patch(current_user,memo_id):
 
 @user_memories_bp.delete('/memodel/<memo_id>')
 @token_required
-def delete(current_user,memo_id):
-
+def delete(memo_id):
+    current_user = request.current_user
     memo = MemoryModel.query.filter_by(id=memo_id, user_id=current_user.id).first()
     if not memo:
         return {'message' : ' memory not found for the current user!'}

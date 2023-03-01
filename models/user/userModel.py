@@ -1,9 +1,15 @@
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
+from models.User.userTypeEnum import EUserType
 from models.db import db
 from geoalchemy2 import Geometry
+<<<<<<< HEAD
 from models.Memories.caregiversMemoriesModel import CaregiverMemory
+=======
+from models.User.userTypeEnum import EUserType
+from sqlalchemy import Enum
+>>>>>>> 9daca5f8d62aba96d1dd97eb6183e932060e7b93
 
 class User(db.Model):
     __tablename__ = "user"
@@ -14,7 +20,7 @@ class User(db.Model):
     email = db.Column(db.String(80), unique=True, nullable=False)
     password = db.Column(db.String(128))
     photo_path = db.Column(db.Text())
-    user_type = db.Column(db.String(20), nullable=False)
+    user_type = db.Column(Enum(EUserType))
     address = db.Column(db.String(100), nullable=False)
     phone = db.Column(db.String(20), nullable=False)
     date_of_birth = db.Column(db.Date, nullable=True)
