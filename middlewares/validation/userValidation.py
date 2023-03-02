@@ -20,7 +20,7 @@ class CreateUserscheme(Schema):
     location = fields.Method("get_location", deserialize="load_location")
     email=fields.Email(required=True)
     password=fields.Str(required=True,validate=Regexp(pass_regex))
-    file =fields.Raw(type=werkzeug.datastructures.FileStorage) 
+    photo_path =fields.URL()
     user_type=fields.Str(required=True,validate=OneOf(user_types))
     address=fields.Str(required=True,validate=Length(min=3))
     phone = fields.Str(validate=Regexp(phone_regex))
@@ -43,26 +43,31 @@ class LoginUserscheme(Schema):
      password=fields.Str(required=True,validate=Regexp(pass_regex))
 
 class CreateResetPasswordEmailSendInputSchema(Schema):
-    # the 'required' argument ensures the field exists
     email = fields.Email(required=True)
     channel=fields.Str(required=True,validate=OneOf(channels),error="the channel sent is not correct")
 
 class VerifyEmailaddress(Schema):
-    # the 'required' argument ensures the field exists
     email = fields.Email(required=True)
     verificationcode=fields.Int(required=True)
 
 class ResetPasswordInputSchema(Schema):
-    # the 'required' argument ensures the field exists
     password = fields.Str(required=True,validate=Regexp(pass_regex))
     email=fields.Email(required=True)
     password=fields.Str(required=True,validate=Regexp(pass_regex))
 
 
-class userscheme(Schema):
+class userMemorySchema(Schema):
+
+    id=fields.Int(dump_only=True)
+    title = fields.Str(validate=Length(min=3,max=60))
+    memo_body = fields.Str(validate=Length(min=3))
+    thumbnail=fields.URL()
+    memo_date = fields.Date()
+
+class Userscheme(Schema):
     class Meta:
             
-     fields = ("username","firstname","lastname","email","file","user_type","phone")
+     fields = ("username","firstname","lastname","email","file","user_type","phone","caregiver_memories")
     username = fields.Str(required=True, validate=Length(min=3,max=60)) 
     firstname=fields.Str(required=True,validate=Length(min=3,max=60))
     lastname=fields.Str(required=True,validate=Length(min=3,max=60))
@@ -74,6 +79,8 @@ class userscheme(Schema):
     address=fields.Str(required=True,validate=Length(min=3))
     phone = fields.Str(validate=Regexp(phone_regex))
     date_of_birth=fields.Date(required=True)
+    caregiver_memories=fields.List(fields.Nested(userMemorySchema()))
+
     @validates('date_of_birth')
     def is_notborn_in_future(self,value):
         """'value' is the datetime parsed from time_created by marshmasllow"""
