@@ -7,6 +7,8 @@ from repositories.memoRepository import MemoryRepository
 from models.Memories.userMemoriesModel import MemoryModel
 from middlewares.validation.userMemoryValidation import MemorySchema
 from repositories.userRepository import UserRepository
+from repositories.caregiverMemoRepository import caregiverMemoryRepository 
+
 from middlewares.auth import token_required
 from sqlalchemy import exc
 
@@ -29,7 +31,6 @@ def post():
     if errors:
         return errors, 422
     payload =MemorySchema().load(request.form)
-    print(payload['caregivers'])
     if not current_user.id==payload['user_id']:
         return {'message' : 'not a valid user'}
     
@@ -57,6 +58,22 @@ def post():
      return resp
     
 
+@user_memories_bp.delete('/deletecaregiver/<memo_id>') #delete caregivers 
+@token_required
+def deletecaregiver(memo_id):
+        payload =request.json
+        try:
+         caregivers_ids=payload['caregivers_ids']
+         for caregiver_id in caregivers_ids:
+            caregiverMemoryRepository().delete(memo_id,caregiver_id)
+         resp = jsonify({'message' : 'caregivers deleted successfully'})
+         resp.status_code=200
+         return resp
+        except exc.SQLAlchemyError as err:
+            print(type(err))
+            return {'message' : 'failed to delete caregivers'}
+
+
 @user_memories_bp.post('/caregiveradd/<memo_id>') #add caregivers 
 @token_required
 def addcaregiver(memo_id):
@@ -76,7 +93,6 @@ def addcaregiver(memo_id):
         except exc.SQLAlchemyError as err:
             print(type(err))
             return {'message' : 'failed to add caregivers'}
-
 
 
 @user_memories_bp.get('/memoesget') #get all memories
@@ -106,8 +122,6 @@ def getmemo(memo_id):
          return {'message' : ' memory  not found for the current user!'}
 
     return memoryschema.dump(memo)
-
-
 
 @user_memories_bp.get('/userget') #####get user info from memory
 @token_required
