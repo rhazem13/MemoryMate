@@ -25,7 +25,6 @@ class User(db.Model):
     #locations = relationship('UserLocationModel')
     #notifications = relationship('NotificationsModel')
     caregiver_memories=db.relationship("MemoryModel",secondary="caregiverMemory",back_populates='caregivers')
-    
     patient_memories=db.relationship('MemoryModel',backref='patient')
 
 

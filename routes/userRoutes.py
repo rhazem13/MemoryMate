@@ -39,7 +39,7 @@ LOG = logging.getLogger('alerta.plugins.twilio')
 
 
 userRepository = UserRepository()
-UPLOAD_FOLDER = 'static\image'
+UPLOAD_FOLDER = 'static\\userphotos\\'
 TWILIO_ACCOUNT_SID = os.environ.get('TWILIO_ACCOUNT_SID')
 TWILIO_AUTH_TOKEN = os.environ.get('TWILIO_AUTH_TOKEN')
 VERIFY_SERVICE_SID = os.environ.get('VERIFY_SERVICE_SID')
@@ -69,16 +69,33 @@ def allowed_file(filename):
 
 @user_bp.post('/register')
 def register():
-    errors = create_user_schema.validate(request.get_json())
+    errors = create_user_schema.validate(request.form)
     if errors:
         return errors, 422
-    payload = create_user_schema.load(request.json)
-
+    payload = create_user_schema.load(request.form)
     hashed_password = generate_password_hash(
         payload['password']).decode('utf-8')
     payload['password'] = hashed_password
+
+    if 'photo_path' not in request.files:
+        resp=jsonify({'message' : 'No  image  in the request'})
+        resp.status_code=400
+        return resp
+    photo = request.files['photo_path']
+    if photo.filename=='':
+        resp=jsonify({'message' : 'No image selected for uploading'})
+        resp.status_code=400
+        return resp
+    if photo and allowed_file(photo.filename):
+         
+     photo_name = secure_filename(photo.filename)
+     photo_path = UPLOAD_FOLDER+photo_name
+     print(photo_path)
+     photo.save( photo_path)
+
+     payload['photo_path']=photo_path
     try:
-        user = userRepository.create(payload)
+        userRepository.create(payload)
         return {'message': 'registered successfully'}
     except ValidationError as err:
         # print the error
