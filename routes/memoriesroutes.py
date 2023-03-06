@@ -32,7 +32,7 @@ def post():
         return errors, 422
     payload =MemorySchema().load(request.form)
     if not current_user.id==payload['user_id']:
-        return {'message' : 'not a valid user'}
+        return jsonify({'message' : 'not a valid user'},403)
     
     if 'thumbnail' not in request.files:
         resp=jsonify({'message' : 'No thumbnail image  in the request'})
@@ -58,21 +58,6 @@ def post():
      return resp
     
 
-@user_memories_bp.delete('/deletecaregiver/<memo_id>') #delete caregivers 
-@token_required
-def deletecaregiver(memo_id):
-        payload =request.json
-        try:
-         caregivers_ids=payload['caregivers_ids']
-         for caregiver_id in caregivers_ids:
-            caregiverMemoryRepository().delete(memo_id,caregiver_id)
-         resp = jsonify({'message' : 'caregivers deleted successfully'})
-         resp.status_code=200
-         return resp
-        except exc.SQLAlchemyError as err:
-            print(type(err))
-            return {'message' : 'failed to delete caregivers'}
-
 
 @user_memories_bp.post('/caregiveradd/<memo_id>') #add caregivers 
 @token_required
@@ -95,14 +80,14 @@ def addcaregiver(memo_id):
             return {'message' : 'failed to add caregivers'}
 
 
-@user_memories_bp.get('/memoesget') #get all memories
-@token_required
-def getmemos():
+# @user_memories_bp.get('/memoesget') #get all memories
+# @token_required
+# def getmemos():
  
-     memos= memoryRepository.get_all()
-     return memoryManyschema.dump(memos)
+#      memos= memoryRepository.get_all()
+#      return memoryManyschema.dump(memos)
 
-@user_memories_bp.get('/usermemoget') #get memos of specific user
+@user_memories_bp.get('/usermemoget') #get memos of current user
 @token_required
 def geUsermemos():
     current_user = request.current_user
@@ -112,7 +97,7 @@ def geUsermemos():
 
     return memoryManyschema.dump(USERmemos)
 
-@user_memories_bp.get('/memoget/<memo_id>') #get specific memo of specific user
+@user_memories_bp.get('/memoget/<memo_id>') #get specific memo of current user
 @token_required
 def getmemo(memo_id):
     current_user = request.current_user
@@ -125,7 +110,8 @@ def getmemo(memo_id):
 
 @user_memories_bp.get('/userget') #####get user info from memory
 @token_required
-def getuser(current_user):
+def getuser():
+    current_user = request.current_user
 
     memo = MemoryModel.query.filter_by( user_id=current_user.id).first()
     usr=memo.patient.photo_path
@@ -147,7 +133,7 @@ def patch(memo_id):
     payload = MemorySchema().load(request.form,partial=True)
     result=memoryRepository.update(payload,memo_id)
     if not result:
-        return "memory Id doesn't exist",404
+        return "memory can't be updated",404
     return memoryschema.dump(result)
 
 @user_memories_bp.delete('/memodel/<memo_id>')
@@ -159,6 +145,19 @@ def delete(memo_id):
         return {'message' : ' memory not found for the current user!'}
     result = memoryRepository.delete(memo.id)
     if(result):
-        return {"the following memory id is deleted" :f"{memo.id}"}
-    abort(404)
+        return jsonify({"the following memory id is deleted" :f"{memo.id}"}),404
 
+@user_memories_bp.delete('/deletecaregiver/<memo_id>') #delete caregivers 
+@token_required
+def deletecaregiver(memo_id):
+        payload =request.json
+        try:
+         caregivers_ids=payload['caregivers_ids']
+         for caregiver_id in caregivers_ids:
+            caregiverMemoryRepository().delete(memo_id,caregiver_id)
+         resp = jsonify({'message' : 'caregivers deleted successfully'})
+         resp.status_code=200
+         return resp
+        except exc.SQLAlchemyError as err:
+            print(type(err))
+            return jsonify({'message' : 'failed to delete caregivers'},403)

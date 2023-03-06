@@ -18,8 +18,7 @@ def token_required(f):
 
         try: 
             data = jwt.decode(token,'secret', algorithms=['HS256'])
-            print("ok")
-            request.current_user = User.query.filter_by(id=data['id']).first()       
+            request.current_user = User.query.filter_by(id=data['id']).first()
         except:
             return jsonify({'message' : 'you are not supposed to be here!'}), 401
 

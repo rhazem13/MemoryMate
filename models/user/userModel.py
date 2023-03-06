@@ -17,7 +17,7 @@ class User(db.Model):
     email = db.Column(db.String(80), unique=True, nullable=False)
     password = db.Column(db.String(128))
     photo_path = db.Column(db.Text())
-    user_type = db.Column(Enum(EUserType))
+    user_type = db.Column(db.String(20))
     address = db.Column(db.String(100), nullable=False)
     phone = db.Column(db.String(20), nullable=False)
     date_of_birth = db.Column(db.Date, nullable=True)

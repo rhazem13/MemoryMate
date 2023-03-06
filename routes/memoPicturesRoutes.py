@@ -23,26 +23,20 @@ ALLOWED_EXTENSIONS = set(['txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'])
 
 @memories_pics_bp.post('/memopicsadd') #add memo pic
 @token_required
-def post(current_user):
+def post():
+    current_user = request.current_user
 
     errors=  MemoryPicSchema().validate(request.form)
     if errors:
         return errors, 422
     
-    
     payload = MemoryPicSchema().load(request.form)
     memopic=MemoryPicsRepository.get_by_memory_id(payload['memory_id'])
     if not  memopic:
          return {'message' : 'memory not found '}
-
-
     if not  memopic.user_id==current_user.id:
-      return {'message' : 'not a valid user'}
+      return {'message' : 'not a valid memory for the current user'}
        
-
-
-    
-    
     if 'memoPic_path' not in request.files:
         resp=jsonify({'message' : 'No  image  in the request'})
         resp.status_code=400
@@ -68,7 +62,8 @@ def post(current_user):
 
 @memories_pics_bp.get('/memopicsget/<memo_id>') #get memo pics of specific memory
 @token_required
-def getmemospics(current_user,memo_id):
+def getmemospics(memo_id):
+    current_user = request.current_user
 
     memopics = MemoPictures.query.filter_by(memory_id=memo_id).all()
     for memopic in memopics:
@@ -81,7 +76,9 @@ def getmemospics(current_user,memo_id):
 
 @memories_pics_bp.get('/usermemopicsget') #get memo pics of specific user
 @token_required
-def usergetmemospics(current_user):
+def usergetmemospics():
+    current_user = request.current_user
+
 
     usermemopics=MemoryPicsRepository().get_all()
     if not usermemopics:
@@ -95,7 +92,8 @@ def usergetmemospics(current_user):
 
 @memories_pics_bp.get('/memopicget/<memopic_id>') #get specific memo pic of specific user
 @token_required
-def getmemo(current_user,memopic_id):
+def getmemo(memopic_id):
+    current_user = request.current_user
 
     memopic = MemoPictures.query.filter_by(id=memopic_id).first()
     if not memopic:
@@ -110,7 +108,9 @@ def getmemo(current_user,memopic_id):
 
 @memories_pics_bp.delete('/memopicdel/<memopic_id>') #delete specific memo
 @token_required
-def delete(current_user,memopic_id):
+def delete(memopic_id):
+    current_user = request.current_user
+
 
     memopic = MemoPictures.query.filter_by(id=memopic_id).first()
     if not memopic:
