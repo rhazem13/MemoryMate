@@ -47,12 +47,10 @@ class CreateResetPasswordEmailSendInputSchema(Schema):
     channel=fields.Str(required=True,validate=OneOf(channels),error="the channel sent is not correct")
 
 class VerifyEmailaddress(Schema):
-    email = fields.Email(required=True)
     verificationcode=fields.Int(required=True)
 
 class ResetPasswordInputSchema(Schema):
-    password = fields.Str(required=True,validate=Regexp(pass_regex))
-    email=fields.Email(required=True)
+  
     password=fields.Str(required=True,validate=Regexp(pass_regex))
 
 
