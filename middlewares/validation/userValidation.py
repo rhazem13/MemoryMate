@@ -13,14 +13,14 @@ channels=['sms','call','whatsapp']
 
 class CreateUserscheme(Schema):
     class Meta:
-        fields = ("username","firstname","lastname","location","email","password","file","user_type","address","phone","date_of_birth")
+        fields = ("username","firstname","lastname","email","password","file","user_type","address","phone","date_of_birth")
     username = fields.Str(required=True, validate=Length(min=3,max=60)) 
     firstname=fields.Str(required=True,validate=Length(min=3,max=60))
     lastname=fields.Str(required=True,validate=Length(min=3,max=60))
     location = fields.Method("get_location", deserialize="load_location")
     email=fields.Email(required=True)
     password=fields.Str(required=True,validate=Regexp(pass_regex))
-    file =fields.Raw(type=werkzeug.datastructures.FileStorage) 
+    photo_path =fields.URL()
     user_type=fields.Str(required=True,validate=OneOf(user_types))
     address=fields.Str(required=True,validate=Length(min=3))
     phone = fields.Str(validate=Regexp(phone_regex))
@@ -43,19 +43,47 @@ class LoginUserscheme(Schema):
      password=fields.Str(required=True,validate=Regexp(pass_regex))
 
 class CreateResetPasswordEmailSendInputSchema(Schema):
-    # the 'required' argument ensures the field exists
     email = fields.Email(required=True)
     channel=fields.Str(required=True,validate=OneOf(channels),error="the channel sent is not correct")
 
 class VerifyEmailaddress(Schema):
-    # the 'required' argument ensures the field exists
-    email = fields.Email(required=True)
     verificationcode=fields.Int(required=True)
 
 class ResetPasswordInputSchema(Schema):
-    # the 'required' argument ensures the field exists
-    password = fields.Str(required=True,validate=Regexp(pass_regex))
+  
+    password=fields.Str(required=True,validate=Regexp(pass_regex))
+
+
+class userMemorySchema(Schema):
+
+    id=fields.Int(dump_only=True)
+    title = fields.Str(validate=Length(min=3,max=60))
+    memo_body = fields.Str(validate=Length(min=3))
+    thumbnail=fields.URL()
+    memo_date = fields.Date()
+
+class Userscheme(Schema):
+    class Meta:
+            
+     fields = ("username","firstname","lastname","email","file","user_type","phone","caregiver_memories")
+    username = fields.Str(required=True, validate=Length(min=3,max=60)) 
+    firstname=fields.Str(required=True,validate=Length(min=3,max=60))
+    lastname=fields.Str(required=True,validate=Length(min=3,max=60))
+    location = fields.Method("get_location", deserialize="load_location")
     email=fields.Email(required=True)
     password=fields.Str(required=True,validate=Regexp(pass_regex))
-class Memoryscheme(Schema):
-    thumbnail =fields.Str() 
+    file =fields.Raw(type=werkzeug.datastructures.FileStorage) 
+    user_type=fields.Str(required=True,validate=OneOf(user_types))
+    address=fields.Str(required=True,validate=Length(min=3))
+    phone = fields.Str(validate=Regexp(phone_regex))
+    date_of_birth=fields.Date(required=True)
+    caregiver_memories=fields.List(fields.Nested(userMemorySchema()))
+
+    @validates('date_of_birth')
+    def is_notborn_in_future(self,value):
+        """'value' is the datetime parsed from time_created by marshmasllow"""
+        now = datetime.datetime.now().date()
+        if value > now:
+            raise ValidationError("Can't be born in the future!")
+
+
