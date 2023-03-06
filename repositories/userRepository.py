@@ -5,7 +5,6 @@ from models.UserContacts.userContactsModel import UserContacts
 #comment by hazem =>
 #we import some models as if we don't import them they won't be noticed in the migrations
 #To do : change this to db file and export them
-from models.Memories.caregiversMemoriesModel import CaregiverMemory
 from models.Memories.memoryPicsModel import MemoPictures
 from models.Memories.userMemoriesModel import MemoryModel
 from models.UserFaces.userfacesModel import UserfacesModel
