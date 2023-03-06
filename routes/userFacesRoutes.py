@@ -14,9 +14,8 @@ facesRepository= UserfacesRepository()
 # testing the photo upload service
 @user_face_bp.post('/test')
 def postz():
-    payload =request.json
-    
-    return {"result": photoService.addPhoto(payload['photo'],payload['folder'])}
+    result = request.json
+    return {"result": photoService.addPhoto(result['photo'],result['folder'])}
 
 @user_face_bp.get('/test/<int:id>')
 def getz(id):
