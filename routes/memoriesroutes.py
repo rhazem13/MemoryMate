@@ -1,13 +1,14 @@
 from flask import request, Blueprint,jsonify
 from flask_restful import abort
+from models.db import db
 import os
 from werkzeug.utils import secure_filename
 from repositories.memoRepository import MemoryRepository
 from models.Memories.userMemoriesModel import MemoryModel
-from models.User.userModel import User
 from middlewares.validation.userMemoryValidation import MemorySchema
 from repositories.userRepository import UserRepository
 from middlewares.auth import token_required
+from sqlalchemy import exc
 
 user_memories_bp = Blueprint('memory', __name__)
 memoryRepository = MemoryRepository()
@@ -27,7 +28,7 @@ def post():
     
     if errors:
         return errors, 422
-    payload =MemorySchema().load(request.values)
+    payload =MemorySchema().load(request.form)
     print(payload['caregivers'])
     if not current_user.id==payload['user_id']:
         return {'message' : 'not a valid user'}
@@ -48,18 +49,35 @@ def post():
      thumbnail.save( thumbnail_path)
 
      payload['thumbnail']=thumbnail_path
-     caregiver1=UserRepository().get_by_id(30)
-     caregiver2=UserRepository().get_by_id(32)
-     caregiver3=UserRepository().get_by_id(33)
-     payload['caregivers']=[30,33,32]
      memory=memoryRepository.create(payload)
-     memory.caregivers=payload['caregivers']
-
      return MemorySchema().dump(memory)
     else:
      resp = jsonify({'message' : 'Allowed file types are txt, pdf, png, jpg, jpeg, gif'})
      resp.status_code=400
      return resp
+    
+
+@user_memories_bp.post('/caregiveradd/<memo_id>') #add caregivers 
+@token_required
+def addcaregiver(memo_id):
+        payload =request.json
+        memory=memoryRepository.get_by_id(memo_id)
+        caregivers=[]
+        try:
+         caregivers_ids=payload['caregivers_ids']
+         for caregiver_id in caregivers_ids:
+             cg=UserRepository().get_by_id(caregiver_id)
+             caregivers.append(cg)
+         (memory.caregivers).extend(caregivers)
+         resp = jsonify({'message' : 'caregivers added successfully'})
+         resp.status_code=200
+         db.session.commit()
+         return resp
+        except exc.SQLAlchemyError as err:
+            print(type(err))
+            return {'message' : 'failed to add caregivers'}
+
+
 
 @user_memories_bp.get('/memoesget') #get all memories
 @token_required

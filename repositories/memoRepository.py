@@ -38,7 +38,7 @@ class MemoryRepository(Repository):
         return True
 
 
-   def get_by_id(id):
+   def get_by_id(self,id):
         result = MemoryModel.query.get(id)
         return result
    def get_by_user_id(user_id):
