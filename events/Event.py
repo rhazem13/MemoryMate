@@ -1,21 +1,16 @@
 from services.EventEmitter.event_emitter import EventEmitter
 from repositories.notificationsRepository import NotificationsRepository
+
 class Event:
-    def __init__(self, channel) -> None:
-        self.channel = channel
+    def notify(self, sender_id, reciever_id, channel, args=None):
         self.emitter = EventEmitter.getInstance()
-        self.repo = NotificationsRepository()
-    
-    def notify(self, sender_id, reciever_id, args=None):
+        repo = NotificationsRepository()
         data = self.getData(sender_id, reciever_id, args)
-        self.store(data)
-        self.emit(data)
+        repo.create(data)
+        self.emit(data, args)
 
-    def emit(self, data):
-        self.emitter.emit(self.channel, data)
+    def emit(self, data, args=None):
+        self.emitter.emit(data, args)
 
-    def store(self, data):
-        self.repo.create(data)
-    
     def getData(self, sender_id, reciever_id, args=None):
         raise NotImplementedError("getData function not implemented")
