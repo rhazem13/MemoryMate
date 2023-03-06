@@ -14,6 +14,7 @@ from models.UserContacts.userContactsModel import UserContacts
 from models.UserFaces.userfacesModel import UserfacesModel
 from models.User.userTypeEnum import EUserType
 from repositories.repository import Repository
+from repositories.contactsRepository import ContactsRepository
 from sqlalchemy.orm import load_only
 from sqlalchemy import func
 from repositories.contactsRepository import ContactsRepository
@@ -58,4 +59,15 @@ class UserRepository(Repository):
       User.password,User.date_of_birth,User.email,
       func.ST_AsGeoJSON(func.ST_Envelope(User.location)).label('location')).filter(User.id.in_(idlist)).all()
       return patients
+
+   def get_caregivers_by_patient_id(patient_id):
+      contacts = ContactsRepository.findByUserId(patient_id)
+      if contacts is None:
+         return
+      print('contacts are ',contacts, patient_id)
+      ids = list()
+      for contact in contacts:
+         ids.append(contact.contact_id)
+      result = User.query.filter(User.id.in_(ids)).all()
+      return result 
 
