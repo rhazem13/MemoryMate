@@ -13,14 +13,14 @@ channels=['sms','call','whatsapp']
 
 class CreateUserscheme(Schema):
     class Meta:
-        fields = ("username","firstname","lastname","email","password","file","user_type","address","phone","date_of_birth")
+        fields = ("username","firstname","lastname","email","password","photo_path","user_type","address","phone","date_of_birth")
     username = fields.Str(required=True, validate=Length(min=3,max=60)) 
     firstname=fields.Str(required=True,validate=Length(min=3,max=60))
     lastname=fields.Str(required=True,validate=Length(min=3,max=60))
     location = fields.Method("get_location", deserialize="load_location")
     email=fields.Email(required=True)
     password=fields.Str(required=True,validate=Regexp(pass_regex))
-    photo_path =fields.URL()
+    photo_path =fields.Str()
     user_type=fields.Str(required=True,validate=OneOf(user_types))
     address=fields.Str(required=True,validate=Length(min=3))
     phone = fields.Str(validate=Regexp(phone_regex))
@@ -65,14 +65,14 @@ class userMemorySchema(Schema):
 class Userscheme(Schema):
     class Meta:
             
-     fields = ("username","firstname","lastname","email","file","user_type","phone","caregiver_memories")
+     fields = ("username","firstname","lastname","email","photo_path","user_type","phone","caregiver_memories")
     username = fields.Str(required=True, validate=Length(min=3,max=60)) 
     firstname=fields.Str(required=True,validate=Length(min=3,max=60))
     lastname=fields.Str(required=True,validate=Length(min=3,max=60))
     location = fields.Method("get_location", deserialize="load_location")
     email=fields.Email(required=True)
     password=fields.Str(required=True,validate=Regexp(pass_regex))
-    file =fields.Raw(type=werkzeug.datastructures.FileStorage) 
+    photo_path =fields.Str()
     user_type=fields.Str(required=True,validate=OneOf(user_types))
     address=fields.Str(required=True,validate=Length(min=3))
     phone = fields.Str(validate=Regexp(phone_regex))

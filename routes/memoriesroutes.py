@@ -11,12 +11,15 @@ from repositories.caregiverMemoRepository import caregiverMemoryRepository
 
 from middlewares.auth import token_required
 from sqlalchemy import exc
+from services.photoservice.photoservice import PhotoService
 
+
+photoService = PhotoService.getInstance()
 user_memories_bp = Blueprint('memory', __name__)
 memoryRepository = MemoryRepository()
 memoryschema = MemorySchema()
 memoryManyschema = MemorySchema(many=True)
-UPLOAD_FOLDER = 'static\\memories\\'
+Folder_Name="memory thumbnail"
 ALLOWED_EXTENSIONS = set(['txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'])
 
 def allowed_file(filename):
@@ -26,36 +29,38 @@ def allowed_file(filename):
 @token_required
 def post():
     current_user = request.current_user
-    errors= MemorySchema().validate(request.form)
+    errors= MemorySchema().validate(request.json)
     
     if errors:
         return errors, 422
-    payload =MemorySchema().load(request.form)
+    payload =MemorySchema().load(request.json)
     if not current_user.id==payload['user_id']:
         return jsonify({'message' : 'not a valid user'},403)
     
-    if 'thumbnail' not in request.files:
-        resp=jsonify({'message' : 'No thumbnail image  in the request'})
-        resp.status_code=400
-        return resp
-    thumbnail = request.files['thumbnail']
-    if thumbnail.filename=='':
-        resp=jsonify({'message' : 'No image selected for uploading'})
-        resp.status_code=400
-        return resp
-    if thumbnail and allowed_file(thumbnail.filename):
+    # if 'thumbnail' not in request.files:
+    #     resp=jsonify({'message' : 'No thumbnail image  in the request'})
+    #     resp.status_code=400
+    #     return resp
+    # thumbnail = request.files['thumbnail']
+    # if thumbnail.filename=='':
+    #     resp=jsonify({'message' : 'No image selected for uploading'})
+    #     resp.status_code=400
+    #     return resp
+    # if thumbnail and allowed_file(thumbnail.filename):
          
-     thumbnail_name = secure_filename(thumbnail.filename)
-     thumbnail_path =  UPLOAD_FOLDER+ thumbnail_name
-     thumbnail.save( thumbnail_path)
+    #  thumbnail_name = secure_filename(thumbnail.filename)
+    #  thumbnail_path =  UPLOAD_FOLDER+ thumbnail_name
+    #  thumbnail.save( thumbnail_path)
 
-     payload['thumbnail']=thumbnail_path
-     memory=memoryRepository.create(payload)
-     return MemorySchema().dump(memory)
-    else:
-     resp = jsonify({'message' : 'Allowed file types are txt, pdf, png, jpg, jpeg, gif'})
-     resp.status_code=400
-     return resp
+    #  payload['thumbnail']=thumbnail_path
+    photo_url=photoService.addPhoto(payload['thumbnail'],Folder_Name)
+    payload['thumbnail']=photo_url
+    memory=memoryRepository.create(payload)
+    return MemorySchema().dump(memory)
+    # else:
+    #  resp = jsonify({'message' : 'Allowed file types are txt, pdf, png, jpg, jpeg, gif'})
+    #  resp.status_code=400
+    #  return resp
     
 
 

@@ -8,14 +8,15 @@ from repositories.userRepository import UserRepository
 from middlewares.auth import token_required
 from models.Memories.memoryPicsModel import MemoPictures
 from models.Memories.userMemoriesModel import MemoryModel
+from services.photoservice.photoservice import PhotoService
 
 
+photoService = PhotoService.getInstance()
 memories_pics_bp = Blueprint('memory_picture', __name__)
 memory_pictures_Repository = MemoryPicsRepository()
 memoryPicschema = MemoryPicSchema()
 memoryPicManyschema = MemoryPicSchema(many=True)
-UPLOAD_FOLDER = 'static\\memories\\'
-
+Folder_Name="memories pictures"
 def allowed_file(filename):
 	return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 ALLOWED_EXTENSIONS = set(['txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'])
@@ -26,38 +27,41 @@ ALLOWED_EXTENSIONS = set(['txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'])
 def post():
     current_user = request.current_user
 
-    errors=  MemoryPicSchema().validate(request.form)
+    errors=  MemoryPicSchema().validate(request.json)
     if errors:
         return errors, 422
     
-    payload = MemoryPicSchema().load(request.form)
+    payload = MemoryPicSchema().load(request.json)
     memopic=MemoryPicsRepository.get_by_memory_id(payload['memory_id'])
     if not  memopic:
          return {'message' : 'memory not found '}
     if not  memopic.user_id==current_user.id:
       return {'message' : 'not a valid memory for the current user'}
        
-    if 'memoPic_path' not in request.files:
-        resp=jsonify({'message' : 'No  image  in the request'})
-        resp.status_code=400
-        return resp
-    memory_picture = request.files['memoPic_path']
-    if memory_picture.filename=='':
-        resp=jsonify({'message' : 'No image selected for uploading'})
-        resp.status_code=400
-        return resp
-    if memory_picture and allowed_file(memory_picture.filename):
+    # if 'memoPic_path' not in request.files:
+    #     resp=jsonify({'message' : 'No  image  in the request'})
+    #     resp.status_code=400
+    #     return resp
+    # memory_picture =payload['memoPic_path']
+    # if memory_picture.filename=='':
+    #     resp=jsonify({'message' : 'No image selected for uploading'})
+    #     resp.status_code=400
+    #     return resp
+    # if memory_picture and allowed_file(memory_picture.filename):
          
-     memory_picture_name = secure_filename(memory_picture.filename)
-     memory_picture_path =  UPLOAD_FOLDER+ memory_picture_name
-     memory_picture.save( memory_picture_path)
+    #  memory_picture_name = secure_filename(memory_picture.filename)
+    #  memory_picture_path =  UPLOAD_FOLDER+ memory_picture_name
+    #  memory_picture.save( memory_picture_path)
 
-     payload['memoPic_path']=memory_picture_path
-     return MemoryPicSchema().dump(memory_pictures_Repository.create(payload))
-    else:
-     resp = jsonify({'message' : 'Allowed file types are txt, pdf, png, jpg, jpeg, gif'})
-     resp.status_code=400
-     return resp
+    #  payload['memoPic_path']=memory_picture_path
+    
+    photo_url=photoService.addPhoto(payload['memoPic_path'],Folder_Name)
+    payload['memoPic_path']=photo_url
+    return MemoryPicSchema().dump(memory_pictures_Repository.create(payload))
+    # else:
+    #  resp = jsonify({'message' : 'Allowed file types are txt, pdf, png, jpg, jpeg, gif'})
+    #  resp.status_code=400
+    #  return resp
 
 
 @memories_pics_bp.get('/memopicsget/<memo_id>') #get memo pics of specific memory
