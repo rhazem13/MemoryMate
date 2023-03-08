@@ -1,6 +1,6 @@
 from flask_restful import fields
 from models.db import db
-from models.User.userModel import User  
+from models.user.userModel import User  
 from models.UserContacts.userContactsModel import UserContacts  
 #comment by hazem =>
 #we import some models as if we don't import them they won't be noticed in the migrations
