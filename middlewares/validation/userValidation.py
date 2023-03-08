@@ -13,7 +13,7 @@ channels=['sms','call','whatsapp']
 
 class CreateUserscheme(Schema):
     class Meta:
-        fields = ("full_name","location","email","password","file","user_type","address","phone","date_of_birth")
+        fields = ("full_name","location","email","password","file","user_type","address","phone","photo_path","date_of_birth")
     full_name = fields.Str(required=True, validate=Length(min=3,max=60)) 
     location = fields.Method("get_location", deserialize="load_location")
     email=fields.Email(required=True)
