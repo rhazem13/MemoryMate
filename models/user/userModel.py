@@ -20,7 +20,7 @@ class User(db.Model):
     phone = db.Column(db.String(20), nullable=False)
     date_of_birth = db.Column(db.Date, nullable=True)
     created_at = db.Column(db.DateTime(timezone=True),server_default=func.now())
-    #locations = relationship('UserLocationModel')
+    locations = relationship('UserLocationModel')
     #notifications = relationship('NotificationsModel')
     caregiver_memories=db.relationship("MemoryModel",secondary="caregiverMemory",back_populates='caregivers')
     patient_memories=db.relationship('MemoryModel',backref='patient')
