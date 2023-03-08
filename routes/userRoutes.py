@@ -23,10 +23,14 @@ from services.EventEmitter.event_emitter import EventEmitter
 from middlewares.auth import token_required
 import logging
 from sqlalchemy.exc import IntegrityError
+from services.photoservice.photoservice import PhotoService
+
+
 
 
 
 load_dotenv()
+photoService = PhotoService.getInstance()
 user_bp = Blueprint('users', __name__)
 cache = CacheService.get_instance()
 emitter = EventEmitter.getInstance()
@@ -41,7 +45,7 @@ LOG = logging.getLogger('alerta.plugins.twilio')
 
 
 userRepository = UserRepository()
-UPLOAD_FOLDER = 'static\\userphotos\\'
+Folder_Name="user photo"
 TWILIO_ACCOUNT_SID = os.environ.get('TWILIO_ACCOUNT_SID')
 TWILIO_AUTH_TOKEN = os.environ.get('TWILIO_AUTH_TOKEN')
 VERIFY_SERVICE_SID = os.environ.get('VERIFY_SERVICE_SID')
@@ -84,23 +88,25 @@ def register():
         payload['password']).decode('utf-8')
      payload['password'] = hashed_password
 
-     if 'photo_path' not in request.files:
-        resp=jsonify({'message' : 'No  image  in the request'})
-        resp.status_code=400
-        return resp
-     photo = request.files['photo_path']
-     if photo.filename=='':
-        resp=jsonify({'message' : 'No image selected for uploading'})
-        resp.status_code=400
-        return resp
-     if photo and allowed_file(photo.filename):
+    #  if 'photo_path' not in request.files:
+    #     resp=jsonify({'message' : 'No  image  in the request'})
+    #     resp.status_code=400
+    #     return resp
+    #  photo = request.files['photo_path']
+    #  if photo.filename=='':
+    #     resp=jsonify({'message' : 'No image selected for uploading'})
+    #     resp.status_code=400
+    #     return resp
+    #  if photo and allowed_file(photo.filename):
          
-      photo_name = secure_filename(photo.filename)
-      photo_path = UPLOAD_FOLDER+photo_name
-      print(photo_path)
-      photo.save( photo_path)
+    #   photo_name = secure_filename(photo.filename)
+    #   photo_path = UPLOAD_FOLDER+photo_name
+    #   print(photo_path)
+    #   photo.save( photo_path)
 
-      payload['photo_path']=photo_path
+    #   payload['photo_path']=photo_path
+     photo_url=photoService.addPhoto(payload['photo_path'],Folder_Name)
+     payload['photo_path']=photo_url
     except ValidationError as err:
         # print the error
           print(err.messages)
@@ -142,14 +148,14 @@ def getuser(id):
     return jsonify({"message":"User not valid"}),403
 
 
-@user_bp.post('/imageupload')
-def test():
-    file = request.files['file']
-    file_name = secure_filename(file.filename)
-    file_path = UPLOAD_FOLDER + file.filename
-    file.save(UPLOAD_FOLDER + file_name)
-    print(file_path)
-    return {'message': 'uploaded successfully'}
+# @user_bp.post('/imageupload')
+# def test():
+#     file = request.files['file']
+#     file_name = secure_filename(file.filename)
+#     file_path = UPLOAD_FOLDER + file.filename
+#     file.save(UPLOAD_FOLDER + file_name)
+#     print(file_path)
+#     return {'message': 'uploaded successfully'}
 
 
 @user_bp.post('/sendOTP') 
