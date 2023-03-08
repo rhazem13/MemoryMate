@@ -71,7 +71,7 @@ def allowed_file(filename):
 
 @user_bp.post('/register')
 def register():
-    errors = create_user_schema.validate(request.form)
+    errors = create_user_schema.validate(request.json)
     if errors:
         return errors, 422
     payload = create_user_schema.load(request.json)
@@ -79,7 +79,7 @@ def register():
         payload['password']).decode('utf-8')
     payload['password'] = hashed_password
     try:
-     payload = create_user_schema.load(request.form)
+     payload = create_user_schema.load(request.json)
      hashed_password = generate_password_hash(
         payload['password']).decode('utf-8')
      payload['password'] = hashed_password
