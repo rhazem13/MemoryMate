@@ -9,4 +9,4 @@ class MemoryPicSchema(Schema):
 
     id=fields.Int(dump_only=True)
     memory_id=fields.Int()
-    memoPic_path=fields.URL()
+    memoPic_path=fields.Str()
