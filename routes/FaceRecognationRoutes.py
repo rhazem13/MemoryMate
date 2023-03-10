@@ -63,7 +63,7 @@ def SaveImageBase64():
 @FaceRecognation.route('/Rec', methods=['GET' , 'POST'])
 def Recognation():
     def TestFaces(test_image):
-        path = "MachineLearning/Face_Recognation/train/"
+        path = "static/faces/Images/"
 
         known_names = []
         known_name_encodings = []
@@ -128,7 +128,7 @@ def Recognation():
 @FaceRecognation.route('/RecBase64', methods=['POST'])
 def RecognationBase64():
     def TestFaces(test_image):
-        path = "MachineLearning/Face_Recognation/train/"
+        path = "static/faces/Images/"
 
         known_names = []
         known_name_encodings = []
