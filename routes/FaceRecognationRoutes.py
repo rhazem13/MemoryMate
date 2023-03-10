@@ -94,7 +94,7 @@ def Recognation():
 
 
 @FaceRecognation.route('/RecBase64', methods=['POST'])
-def Recognation():
+def RecognationBase64():
     def TestFaces(test_image):
         path = "MachineLearning/Face_Recognation/train/"
 
