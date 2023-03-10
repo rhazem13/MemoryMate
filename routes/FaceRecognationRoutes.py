@@ -30,6 +30,36 @@ def SaveIamage():
          
       return jsonify("Image Saved Successfully")
 
+
+@FaceRecognation.route('/SaveFaceBase64' , methods=['POST'])
+def SaveImageBase64():
+     
+      if 'file' not in request.json:
+            resp = jsonify({'message':'No file part in the request'})
+            resp.status_code=400
+            return resp
+      if 'Name' not in request.json:
+            resp = jsonify({'message':'No Name part in the request'})
+            resp.status_code=400
+            return resp
+      pic =request.json['file']
+      Name =request.json['Name']
+
+    
+          
+      starter = pic.find(',')
+      image_data = pic[starter+1:]
+      image_data = bytes(image_data, encoding="ascii")
+      image = BytesIO(base64.b64decode(image_data))
+      im = Image.open(BytesIO(base64.b64decode(image_data)))
+        
+      im.save(f'MachineLearning/Face_Recognation/train/{Name}.jpg')
+
+
+       
+         
+      return jsonify("Image Saved Successfully")
+
 @FaceRecognation.route('/Rec', methods=['GET' , 'POST'])
 def Recognation():
     def TestFaces(test_image):
