@@ -1,7 +1,12 @@
 
+import cv2
+import numpy as np
 from MachineLearning.Alzahemer_Detection.Alzhemer import prediction
 from flask import request, jsonify, Blueprint 
 from MachineLearning.test import readb64
+import base64
+from PIL import Image
+from io import BytesIO
 
 ALZhemer = Blueprint('Alzahemer', __name__)
 
@@ -15,8 +20,8 @@ def Predicit():
             resp.status_code=400
             return resp
          pic =request.files['pic']
-         img_path =  "Alzhiemer/Tests/" + pic.filename
-          
+         img_path =   pic.filename
+         #  "Alzhiemer/Tests/" +
          pic.save(img_path)
 
          predict_result = prediction(img_path)
@@ -30,16 +35,22 @@ def Predicit():
          return predict_result
 
 
-@ALZhemer.route('/PredictBase64', methods=['POST'])
-def Predicit():
+@ALZhemer.route('/sendBase64', methods=['POST'])
+def PredicitBase64():
          pic =request.json['pic']
-         # img_path =  "Alzhiemer/Tests/" + pic
-          
-         # pic.save(img_path)
 
-         img = readb64(pic)
+         starter = pic.find(',')
+         image_data = pic[starter+1:]
+         image_data = bytes(image_data, encoding="ascii")
+         image = BytesIO(base64.b64decode(image_data))
+         im = Image.open(BytesIO(base64.b64decode(image_data)))
+         
+         im.save('image.jpg')
+       
 
-         predict_result = prediction(img)
+         
+
+         predict_result = prediction(image)
 
          
          return predict_result
