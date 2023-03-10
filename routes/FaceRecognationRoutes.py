@@ -7,7 +7,9 @@ from flask import  request, jsonify, Blueprint
 import cv2
 import numpy as np
 from MachineLearning.test import readb64
-
+import base64
+from PIL import Image
+from io import BytesIO
 
 FaceRecognation = Blueprint('Face', __name__)
 
@@ -139,21 +141,22 @@ def RecognationBase64():
 
         return {"The Person is": name}
     
-    if  request.method == 'POST':
-         
-         if 'ph' not in request.json:
-            resp = jsonify({'message':'No file part in the request'})
-            resp.status_code=400
-            return resp
-         pic =request.json['ph']
-        #  img_path =  "Faces/Tests/" + pic.filename
-          
-        #  pic.save(img_path)
-        
-         img = readb64(pic)
 
-         predict_result = TestFaces(img)
+    if 'pic' not in request.json:
+        resp = jsonify({'message':'No file part in the request'})
+        resp.status_code=400
+        return resp
+    
+    pic =request.json['pic']
 
-       
-         
-         return predict_result
+    imgdata = base64.b64decode(pic)
+    filename = 'some_image.jpg'
+
+    with open(filename, 'wb') as f:
+     f.write(imgdata)
+
+    predict_result = TestFaces(filename)
+
+
+    
+    return predict_result
