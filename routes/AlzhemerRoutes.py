@@ -45,7 +45,7 @@ def PredicitBase64():
          image = BytesIO(base64.b64decode(image_data))
          im = Image.open(BytesIO(base64.b64decode(image_data)))
          
-         im.save('image.jpg')
+         #im.save('image.jpg')
        
 
          
