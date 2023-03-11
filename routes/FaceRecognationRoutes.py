@@ -6,7 +6,6 @@ import os
 from flask import  request, jsonify, Blueprint
 import cv2
 import numpy as np
-from MachineLearning.test import readb64
 import base64
 from PIL import Image
 from io import BytesIO
@@ -128,7 +127,7 @@ def Recognation():
 @FaceRecognation.route('/RecBase64', methods=['POST'])
 def RecognationBase64():
     def TestFaces(test_image):
-        path = "static/faces/Images/"
+        path = f"static/faces/{user_id}/"
 
         known_names = []
         known_name_encodings = []
@@ -176,8 +175,21 @@ def RecognationBase64():
         resp = jsonify({'message':'No file part in the request'})
         resp.status_code=400
         return resp
+    if 'id' not in request.json:
+        resp = jsonify({'message':'No User Id part in the request'})
+        resp.status_code=400
+        return resp
+
     
     pic =request.json['pic']
+    user_id =request.json['id']
+
+    if str(user_id) not in f"static/faces/{user_id}":
+        resp = jsonify({'message':'No  Id part in the request'})
+        resp.status_code=400
+        return resp
+
+
 
     imgdata = base64.b64decode(pic)
     filename = 'some_image.jpg'
