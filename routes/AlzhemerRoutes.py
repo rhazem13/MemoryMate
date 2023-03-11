@@ -3,7 +3,6 @@ import cv2
 import numpy as np
 from MachineLearning.Alzahemer_Detection.Alzhemer import prediction
 from flask import request, jsonify, Blueprint 
-from MachineLearning.test import readb64
 import base64
 from PIL import Image
 from io import BytesIO
