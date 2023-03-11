@@ -183,9 +183,10 @@ def RecognationBase64():
     
     pic =request.json['pic']
     user_id =request.json['id']
+    os.path.isdir(f'static/faces/{user_id}')
 
-    if str(user_id) not in f"static/faces/{user_id}":
-        resp = jsonify({'message':'No  Id part in the request'})
+    if os.path.isdir(f'static/faces/{user_id}') == False:
+        resp = jsonify({'message':'user id not found'})
         resp.status_code=400
         return resp
 
