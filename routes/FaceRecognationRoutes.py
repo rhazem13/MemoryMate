@@ -9,7 +9,7 @@ import numpy as np
 import base64
 from PIL import Image
 from io import BytesIO
-
+from middlewares.auth import token_required
 FaceRecognation = Blueprint('Face', __name__)
 
 @FaceRecognation.route('/Save' , methods=['POST'])
@@ -125,6 +125,7 @@ def Recognation():
 
 
 @FaceRecognation.route('/RecBase64', methods=['POST'])
+@token_required
 def RecognationBase64():
     def TestFaces(test_image):
         path = f"static/faces/{user_id}/"
