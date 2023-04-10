@@ -113,7 +113,11 @@ def register():
     try:
     
      userRepository.create(payload)
-     return jsonify({'message': 'registered successfully'})
+     # create token
+     user = userRepository.get_by_email(payload['email'])
+     token = jwt.encode({'id': user.id}, 'secret')
+     return {'token': token}
+    #  return jsonify({'message': 'registered successfully'})
     except IntegrityError :
         db.session.rollback()
         return jsonify({'message': 'This user already Exists!'},403)
