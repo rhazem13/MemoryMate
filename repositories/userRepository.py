@@ -46,8 +46,9 @@ class UserRepository(Repository):
       result = User.query.filter_by(email = email).first()
       return result
    def get_by_id(self,id):
-        result = User.query.get(id)
-        return result
+      result = User.query.get(id)
+      print(str(vars(result)))
+      return result
 
    def get_attr(id, attr):
       users = session.query(SomeModel).options(load_only(*fields)).all()
