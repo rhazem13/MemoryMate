@@ -38,6 +38,7 @@ create_user_schema = CreateUserscheme()
 locationschema = CreateUserscheme(many=True)
 login_user_schema = LoginUserscheme()
 user_scheme=Userscheme()
+get_user_scheme=getuserscheme()
 codetoEmailSend_validation_schema = CreateResetPasswordEmailSendInputSchema()
 verify_validation_schema = VerifyEmailaddress()
 newpass_validation_schema = ResetPasswordInputSchema()
@@ -142,14 +143,13 @@ def login():
             print(err.messages)
     return Response({"Wrong Password/Email"}, status=403)
 
-@user_bp.get('/getuser/<int:id>')
+@user_bp.get('/getuser')
 @token_required
-def getuser(id):
-    current_user = request.current_user
-    if current_user.id==id:
-      user=User.query.get(id)
-      return user_scheme.dump(user)
-    return jsonify({"message":"User not valid"}),403
+def getuser():
+    current_user = userRepository.get_by_id(request.current_user.id)
+    print(current_user)
+    return get_user_scheme.dump(current_user)
+
 
 
 # @user_bp.post('/imageupload')
