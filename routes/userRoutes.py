@@ -26,9 +26,6 @@ from sqlalchemy.exc import IntegrityError
 from services.photoservice.photoservice import PhotoService
 
 
-
-
-
 load_dotenv()
 photoService = PhotoService.getInstance()
 user_bp = Blueprint('users', __name__)
@@ -46,13 +43,14 @@ LOG = logging.getLogger('alerta.plugins.twilio')
 
 
 userRepository = UserRepository()
-Folder_Name="user photo"
+Folder_Name = "user photo"
 TWILIO_ACCOUNT_SID = os.environ.get('TWILIO_ACCOUNT_SID')
 TWILIO_AUTH_TOKEN = os.environ.get('TWILIO_AUTH_TOKEN')
 VERIFY_SERVICE_SID = os.environ.get('VERIFY_SERVICE_SID')
 
 
 client = Client(TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN)
+
 
 @user_bp.get('/currentusertest')
 @token_required
@@ -84,10 +82,10 @@ def register():
         payload['password']).decode('utf-8')
     payload['password'] = hashed_password
     try:
-     payload = create_user_schema.load(request.json)
-     hashed_password = generate_password_hash(
-        payload['password']).decode('utf-8')
-     payload['password'] = hashed_password
+        payload = create_user_schema.load(request.json)
+        hashed_password = generate_password_hash(
+            payload['password']).decode('utf-8')
+        payload['password'] = hashed_password
 
     #  if 'photo_path' not in request.files:
     #     resp=jsonify({'message' : 'No  image  in the request'})
@@ -99,18 +97,18 @@ def register():
     #     resp.status_code=400
     #     return resp
     #  if photo and allowed_file(photo.filename):
-         
+
     #   photo_name = secure_filename(photo.filename)
     #   photo_path = UPLOAD_FOLDER+photo_name
     #   print(photo_path)
     #   photo.save( photo_path)
 
     #   payload['photo_path']=photo_path
-     photo_url=photoService.addPhoto(payload['photo_path'],Folder_Name)
-     payload['photo_path']=photo_url
+        photo_url = photoService.addPhoto(payload['photo_path'], Folder_Name)
+        payload['photo_path'] = photo_url
     except ValidationError as err:
         # print the error
-          print(err.messages)
+        print(err.messages)
     try:
     
      userRepository.create(payload)
@@ -121,8 +119,7 @@ def register():
     #  return jsonify({'message': 'registered successfully'})
     except IntegrityError :
         db.session.rollback()
-        return jsonify({'message': 'This user already Exists!'},403)
-  
+        return jsonify({'message': 'This user already Exists!'}, 403)
 
 
 @user_bp.post('/login')
@@ -174,40 +171,34 @@ def changephoto():
 #     return {'message': 'uploaded successfully'}
 
 
-@user_bp.post('/sendOTP') 
-@token_required
+@user_bp.post('/sendOTP')
 def reset():
     try:
-
         payload = request.get_json()
         user = UserRepository().get_by_email(payload['email'])
-        current_user = request.current_user
+        # current_user = request.current_user
         errors = codetoEmailSend_validation_schema.validate(payload)
         channel = payload['channel']
-        if not current_user.id==user.id:
-            return jsonify({"message":"User not valid"}),403
-
-
+        # if not current_user.id==user.id:
+        #     return jsonify({"message":"User not valid"}),403
 
         if errors:
             return errors, 422
         if user is None:
-            return jsonify({'message': 'wrong email address , please send a correct email address'}),403
+            return jsonify({'message': 'wrong email address , please send a correct email address'}), 403
     except KeyError as Ke:
         return {'message': "please send your "+str(Ke)}
-    
+
     try:
-
-     phone_number = user.phone
-     client.verify \
-        .services(VERIFY_SERVICE_SID) \
-        .verifications \
-        .create(to=phone_number, channel=channel)
-     return jsonify({'message': 'sent successfully'})
+        phone_number = user.phone
+        client.verify \
+            .services(VERIFY_SERVICE_SID) \
+            .verifications \
+            .create(to=phone_number, channel=channel)
+        return jsonify({'message': 'sent successfully'})
     except TwilioRestException as e:
-            return "Error validating code: {}".format(e)
-
-    
+        print(e)
+        return "Error validating code: {}".format(e)
 
 
 @user_bp.post('/verify')
@@ -217,12 +208,11 @@ def verify():
     try:
         payload = request.get_json()
         current_user = request.current_user
-        
+
         ValidationError = verify_validation_schema.validate(payload)
         user = UserRepository().get_by_id(current_user.id)
         if ValidationError:
             return ValidationError, 422
-        
 
         if user is None:
             return {'message': 'wrong email address , please send a correct email address'}
@@ -260,11 +250,10 @@ def newpass():
 
     user = User.query.filter_by(id=current_user.id).first()
 
-
     errors = newpass_validation_schema.validate(payload)
     if errors:
         return errors, 422
-   
+
     if user is None:
         return{"message": "No record found with this email. please signup first"}
     user.password = generate_password_hash(payload['password']).decode('utf-8')
@@ -290,6 +279,5 @@ def newpass():
 def get_close_friends_locations(id):
 
     users = userRepository.get_close_friends_locations(id)
-    # print(users) 
+    # print(users)
     return locationschema.dump(users)
-
