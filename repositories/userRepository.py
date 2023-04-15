@@ -18,7 +18,8 @@ from repositories.contactsRepository import ContactsRepository
 from sqlalchemy.orm import load_only
 from sqlalchemy import func
 from repositories.contactsRepository import ContactsRepository
-
+from services.photoservice.photoservice import PhotoService
+photoservice= PhotoService()
 contactsRepository = ContactsRepository
 
 class UserRepository(Repository):
@@ -46,8 +47,23 @@ class UserRepository(Repository):
       result = User.query.filter_by(email = email).first()
       return result
    def get_by_id(self,id):
-        result = User.query.get(id)
-        return result
+      result = User.query.get(id)
+      print(str(vars(result)))
+      return result
+   
+   def patch(self,id,data):
+      user = User.query.get(id)
+      for key, value in data.items():
+         setattr(user, key, value)
+      db.session.commit()
+      return user
+
+   def changephoto(self,id,newphoto):
+      user = User.query.get(id)
+      newphotopath = photoservice.addPhoto(newphoto,"users")
+      setattr(user, "photo_path", newphotopath)
+      db.session.commit()
+      return user
 
    def get_attr(id, attr):
       users = session.query(SomeModel).options(load_only(*fields)).all()

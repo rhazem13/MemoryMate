@@ -62,8 +62,7 @@ class userMemorySchema(Schema):
 
 class Userscheme(Schema):
     class Meta:
-            
-     fields = ("username","firstname","lastname","email","photo_path","user_type","phone","caregiver_memories")
+        fields = ("username","firstname","lastname","email","photo_path","user_type","phone","caregiver_memories")
     username = fields.Str(required=True, validate=Length(min=3,max=60)) 
     firstname=fields.Str(required=True,validate=Length(min=3,max=60))
     lastname=fields.Str(required=True,validate=Length(min=3,max=60))
@@ -84,4 +83,18 @@ class Userscheme(Schema):
         if value > now:
             raise ValidationError("Can't be born in the future!")
 
-
+class getuserscheme(Schema):
+    class Meta:
+        fields = ("full_name","email","photo_path","address","date_of_birth","user_type","phone")
+    username = fields.Str(required=True, validate=Length(min=3,max=60)) 
+    firstname=fields.Str(required=True,validate=Length(min=3,max=60))
+    lastname=fields.Str(required=True,validate=Length(min=3,max=60))
+    location = fields.Method("get_location", deserialize="load_location")
+    email=fields.Email(required=True)
+    password=fields.Str(required=True,validate=Regexp(pass_regex))
+    photo_path =fields.Str()
+    user_type=fields.Str(required=True,validate=OneOf(user_types))
+    address=fields.Str(required=True,validate=Length(min=3))
+    phone = fields.Str(validate=Regexp(phone_regex))
+    date_of_birth=fields.Date(required=True)
+    caregiver_memories=fields.List(fields.Nested(userMemorySchema()))
