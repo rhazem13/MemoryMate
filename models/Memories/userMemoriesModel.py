@@ -1,7 +1,7 @@
 from models.db import db,Base
 from models.Memories.memoryPicsModel import MemoPictures
 from models.Memories.caregiversMemoriesModel import CaregiverMemory
-from models.User.userModel import User
+from models.user.userModel import User
 
 class MemoryModel(db.Model,Base):
     __tablename__ = "memory"

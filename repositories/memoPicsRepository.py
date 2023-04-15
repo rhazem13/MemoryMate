@@ -1,5 +1,5 @@
 from models.Memories.memoryPicsModel import MemoPictures
-from models.User.userModel import User
+from models.user.userModel import User
 from repositories.repository import Repository
 from models.Memories.userMemoriesModel import MemoryModel
 

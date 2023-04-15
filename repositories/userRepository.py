@@ -1,6 +1,6 @@
 from flask_restful import fields
 from models.db import db
-from models.User.userModel import User  
+from models.user.userModel import User  
 from models.UserContacts.userContactsModel import UserContacts  
 #comment by hazem =>
 #we import some models as if we don't import them they won't be noticed in the migrations
@@ -12,7 +12,7 @@ from models.UserAgenda.userAgendaModel import UserAgenda
 from models.UserCalendar.userCalendarModel import UserCalendarModel
 from models.UserContacts.userContactsModel import UserContacts
 from models.UserFaces.userfacesModel import UserfacesModel
-from models.User.userTypeEnum import EUserType
+from models.user.userTypeEnum import EUserType
 from repositories.repository import Repository
 from repositories.contactsRepository import ContactsRepository
 from sqlalchemy.orm import load_only

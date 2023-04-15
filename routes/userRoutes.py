@@ -1,7 +1,7 @@
 from flask import Flask, request, Blueprint, jsonify, make_response, session
 from flask_restful import Resource, reqparse, abort
 from flask_bcrypt import generate_password_hash, check_password_hash
-from models.User.userModel import User
+from models.user.userModel import User
 from repositories.userRepository import UserRepository
 from middlewares.validation.userValidation import *
 from repositories.userRepository import UserRepository
