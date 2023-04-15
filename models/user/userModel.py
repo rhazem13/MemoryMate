@@ -1,11 +1,11 @@
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
-from models.User.userTypeEnum import EUserType
+from models.user.userTypeEnum import EUserType
 from models.db import db
 from geoalchemy2 import Geometry
 from models.Memories.caregiversMemoriesModel import CaregiverMemory
-from models.User.userTypeEnum import EUserType
+from models.user.userTypeEnum import EUserType
 from sqlalchemy import Enum
 
 class User(db.Model):
