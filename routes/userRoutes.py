@@ -150,6 +150,18 @@ def getuser():
     print(current_user)
     return get_user_scheme.dump(current_user)
 
+@user_bp.patch('/patchuser')
+@token_required
+def patchuser():
+    user = userRepository.patch(request.current_user.id,request.json)
+    return get_user_scheme.dump(user)
+
+@user_bp.patch('/changephoto')
+@token_required
+def changephoto():
+    user = userRepository.changephoto(request.current_user.id,request.json["img"])
+    return get_user_scheme.dump(user)
+
 
 
 # @user_bp.post('/imageupload')
