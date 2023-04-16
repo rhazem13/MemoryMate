@@ -33,5 +33,5 @@ class MemorySchema(Schema):
     memo_body = fields.Str(validate=Length(min=3))
     thumbnail=fields.Str()
     memo_date = fields.Date()
-    user_id=fields.Int()
-    caregivers=fields.List(fields.Nested(Usermemoryscheme()))
+    user_id=fields.Int(dump_only=True)
+    caregivers=fields.List(fields.Nested(Usermemoryscheme()),dump_only=True)
