@@ -28,7 +28,6 @@ class Usermemoryscheme(Schema):
     phone = fields.Str(validate=Regexp(phone_regex))
     date_of_birth=fields.Date(required=True)
 class MemorySchema(Schema):
-
     id=fields.Int(dump_only=True)
     title = fields.Str(validate=Length(min=3,max=60))
     memo_body = fields.Str(validate=Length(min=3))
@@ -36,8 +35,3 @@ class MemorySchema(Schema):
     memo_date = fields.Date()
     user_id=fields.Int()
     caregivers=fields.List(fields.Nested(Usermemoryscheme()))
-
-    
-        
-
-   
