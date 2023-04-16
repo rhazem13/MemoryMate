@@ -30,12 +30,12 @@ def allowed_file(filename):
 def post():
     current_user = request.current_user
     errors= MemorySchema().validate(request.json)
-    
     if errors:
         return errors, 422
     payload =MemorySchema().load(request.json)
-    if not current_user.id==payload['user_id']:
-        return jsonify({'message' : 'not a valid user'},403)
+    # if not current_user.id==payload['user_id']:
+        # return jsonify({'message' : 'not a valid user'},403)
+    payload['user_id']=current_user.id
     
     # if 'thumbnail' not in request.files:
     #     resp=jsonify({'message' : 'No thumbnail image  in the request'})
