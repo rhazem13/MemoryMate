@@ -128,21 +128,21 @@ def getuser():
 @token_required
 def patch(memo_id):
     current_user = request.current_user
-    errors= memoryschema.validate(request.form,partial=True)
+    errors= memoryschema.validate(request.json,partial=True)
     if errors:
         return errors, 422
     memo = MemoryModel.query.filter_by(id=memo_id, user_id=current_user.id).first()
     if not memo:
-
          return {'message' : ' memory  not found for the current user!'}
-    payload = MemorySchema().load(request.form,partial=True)
+    payload = MemorySchema().load(request.json,partial=True)
+    print(payload)
     result=memoryRepository.update(payload,memo_id)
     if not result:
         return "memory can't be updated",404
     return memoryschema.dump(result)
 
 @user_memories_bp.delete('/memodel/<memo_id>')
-@token_required
+# @token_required
 def delete(memo_id):
     current_user = request.current_user
     memo = MemoryModel.query.filter_by(id=memo_id, user_id=current_user.id).first()
