@@ -53,7 +53,7 @@ app.register_blueprint(user_calendar_bp, url_prefix='/usercalendar')
 app.register_blueprint(notification_bp, url_prefix='/notifications')
 app.register_blueprint(user_contacts_bp, url_prefix='/usercontacts')
 app.register_blueprint(user_memories_bp, url_prefix='/memories')
-app.register_blueprint(memories_pics_bp,url_prefix='/memopics')
+app.register_blueprint(memories_pics_bp, url_prefix='/memopics')
 app.register_blueprint(user_face_bp, url_prefix='/userfaces')
 app.register_blueprint(events_bp, url_prefix='/events')
 app.register_blueprint(caring_bp, url_prefix='/caring')
@@ -96,23 +96,24 @@ emitter = EventEmitter.getInstance()
 
 
 if __name__ == '__main__':
+    print('on main')
     socketio = SocketService.getSocket(app)
+
     @socketio.on('connect')
     @token_required
     def on_connect():
         cur_user = request.current_user
         user_id = cur_user.id
         redis_client.set(user_id, request.sid)
-        print("user ",{cur_user}," with id",user_id, "connected")
-
-
+        print("user ", {cur_user}, " with id", user_id, "connected")
 
     @socketio.on('reminded')
     @token_required
     def agenda_reminded(data):
         agenda_id = data['agenda_id']
         redis_client.delete(f"agenda-{agenda_id}")
-        UserAgendaRepository.updateAgendaStartTimeWithInterval(data['agenda_id'])
-    app.run(host="0.0.0.0",debug=True, use_reloader=False)
+        UserAgendaRepository.updateAgendaStartTimeWithInterval(
+            data['agenda_id'])
+    app.run(host="0.0.0.0", debug=True, use_reloader=True)
 print('starting socket')
 #socketio.run(app, debug = True, host='127.0.0.1')
