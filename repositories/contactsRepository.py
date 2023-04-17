@@ -4,6 +4,10 @@ from models.UserContacts.relationLevelEnum import ERelationLevel
 class ContactsRepository(Repository):
     def __init__(self):
         super().__init__(UserContacts)
+
+    def findByUserId(user_id):
+        result = UserContacts.query.filter(UserContacts.user_id == user_id).all()
+        return result 
     
     def get_patients_ids(id):
         # getting patients ids by caregiver id

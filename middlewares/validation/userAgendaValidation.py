@@ -7,7 +7,7 @@ class UserAgendaSchema(Schema):
         fields = ("id","title","start_time","user_id","repeat_interval")
     title = fields.Str(required=True,validate=Length(1, 254))
     start_time = fields.DateTime(required=True)
-    user_id = fields.Int(required=True)
+    user_id = fields.Int(required=False)
     repeat_interval = fields.TimeDelta(required=True)
 
     @validates('user_id')
