@@ -1,11 +1,10 @@
 from flask_restful import fields
 from models.db import db
-from models.User.userModel import User  
+from models.user.userModel import User  
 from models.UserContacts.userContactsModel import UserContacts  
 #comment by hazem =>
 #we import some models as if we don't import them they won't be noticed in the migrations
 #To do : change this to db file and export them
-from models.Memories.caregiversMemoriesModel import CaregiverMemory
 from models.Memories.memoryPicsModel import MemoPictures
 from models.Memories.userMemoriesModel import MemoryModel
 from models.UserFaces.userfacesModel import UserfacesModel
@@ -13,12 +12,14 @@ from models.UserAgenda.userAgendaModel import UserAgenda
 from models.UserCalendar.userCalendarModel import UserCalendarModel
 from models.UserContacts.userContactsModel import UserContacts
 from models.UserFaces.userfacesModel import UserfacesModel
-from models.User.userTypeEnum import EUserType
+from models.user.userTypeEnum import EUserType
 from repositories.repository import Repository
+from repositories.contactsRepository import ContactsRepository
 from sqlalchemy.orm import load_only
 from sqlalchemy import func
 from repositories.contactsRepository import ContactsRepository
-
+from services.photoservice.photoservice import PhotoService
+photoservice= PhotoService()
 contactsRepository = ContactsRepository
 
 class UserRepository(Repository):
@@ -46,8 +47,23 @@ class UserRepository(Repository):
       result = User.query.filter_by(email = email).first()
       return result
    def get_by_id(self,id):
-        result = User.query.get(id)
-        return result
+      result = User.query.get(id)
+      print(str(vars(result)))
+      return result
+   
+   def patch(self,id,data):
+      user = User.query.get(id)
+      for key, value in data.items():
+         setattr(user, key, value)
+      db.session.commit()
+      return user
+
+   def changephoto(self,id,newphoto):
+      user = User.query.get(id)
+      newphotopath = photoservice.addPhoto(newphoto,"users")
+      setattr(user, "photo_path", newphotopath)
+      db.session.commit()
+      return user
 
    def get_attr(id, attr):
       users = session.query(SomeModel).options(load_only(*fields)).all()
@@ -59,4 +75,15 @@ class UserRepository(Repository):
       User.password,User.date_of_birth,User.email,
       func.ST_AsGeoJSON(func.ST_Envelope(User.location)).label('location')).filter(User.id.in_(idlist)).all()
       return patients
+
+   def get_caregivers_by_patient_id(patient_id):
+      contacts = ContactsRepository.findByUserId(patient_id)
+      if contacts is None:
+         return
+      print('contacts are ',contacts, patient_id)
+      ids = list()
+      for contact in contacts:
+         ids.append(contact.contact_id)
+      result = User.query.filter(User.id.in_(ids)).all()
+      return result 
 

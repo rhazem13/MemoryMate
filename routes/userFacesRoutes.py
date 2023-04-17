@@ -9,10 +9,28 @@ import os
 import base64
 from PIL import Image
 from io import BytesIO
+from services.photoservice.photoservice import PhotoService
+
+photoService = PhotoService.getInstance()
 user_face_bp = Blueprint('userface', __name__)
 manySchema=UserFacesSchema(many=True)
 singleSchema=UserFacesSchema()
 facesRepository= UserfacesRepository()
+
+# testing the photo upload service
+@user_face_bp.post('/test')
+def postz():
+    result = request.json
+    return {"result": photoService.addPhoto(result['photo'],result['folder'])}
+
+@user_face_bp.get('/test/<int:id>')
+def getz(id):
+    photoService.addPhoto()
+    return {"result": photoService.getPhoto(id)}
+
+#######################################
+
+
 @user_face_bp.post('')
 @token_required
 def post():

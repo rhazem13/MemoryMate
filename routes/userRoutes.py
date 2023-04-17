@@ -1,7 +1,7 @@
 from flask import Flask, request, Blueprint, jsonify, make_response, session
 from flask_restful import Resource, reqparse, abort
 from flask_bcrypt import generate_password_hash, check_password_hash
-from models.User.userModel import User
+from models.user.userModel import User
 from repositories.userRepository import UserRepository
 from middlewares.validation.userValidation import *
 from repositories.userRepository import UserRepository
@@ -22,15 +22,20 @@ from services.caching.caching import CacheService
 from services.EventEmitter.event_emitter import EventEmitter
 from middlewares.auth import token_required
 import logging
+from sqlalchemy.exc import IntegrityError
+from services.photoservice.photoservice import PhotoService
 
 
 load_dotenv()
+photoService = PhotoService.getInstance()
 user_bp = Blueprint('users', __name__)
 cache = CacheService.get_instance()
 emitter = EventEmitter.getInstance()
 create_user_schema = CreateUserscheme()
 locationschema = CreateUserscheme(many=True)
 login_user_schema = LoginUserscheme()
+user_scheme=Userscheme()
+get_user_scheme=getuserscheme()
 codetoEmailSend_validation_schema = CreateResetPasswordEmailSendInputSchema()
 verify_validation_schema = VerifyEmailaddress()
 newpass_validation_schema = ResetPasswordInputSchema()
@@ -38,10 +43,11 @@ LOG = logging.getLogger('alerta.plugins.twilio')
 
 
 userRepository = UserRepository()
-UPLOAD_FOLDER = 'static\image'
+Folder_Name = "user photo"
 TWILIO_ACCOUNT_SID = os.environ.get('TWILIO_ACCOUNT_SID')
 TWILIO_AUTH_TOKEN = os.environ.get('TWILIO_AUTH_TOKEN')
 VERIFY_SERVICE_SID = os.environ.get('VERIFY_SERVICE_SID')
+
 
 client = Client(TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN)
 
@@ -68,20 +74,52 @@ def allowed_file(filename):
 
 @user_bp.post('/register')
 def register():
-    errors = create_user_schema.validate(request.get_json())
+    errors = create_user_schema.validate(request.json)
     if errors:
         return errors, 422
     payload = create_user_schema.load(request.json)
-
     hashed_password = generate_password_hash(
         payload['password']).decode('utf-8')
     payload['password'] = hashed_password
     try:
-        user = userRepository.create(payload)
-        return {'message': 'registered successfully'}
+        payload = create_user_schema.load(request.json)
+        hashed_password = generate_password_hash(
+            payload['password']).decode('utf-8')
+        payload['password'] = hashed_password
+
+    #  if 'photo_path' not in request.files:
+    #     resp=jsonify({'message' : 'No  image  in the request'})
+    #     resp.status_code=400
+    #     return resp
+    #  photo = request.files['photo_path']
+    #  if photo.filename=='':
+    #     resp=jsonify({'message' : 'No image selected for uploading'})
+    #     resp.status_code=400
+    #     return resp
+    #  if photo and allowed_file(photo.filename):
+
+    #   photo_name = secure_filename(photo.filename)
+    #   photo_path = UPLOAD_FOLDER+photo_name
+    #   print(photo_path)
+    #   photo.save( photo_path)
+
+    #   payload['photo_path']=photo_path
+        photo_url = photoService.addPhoto(payload['photo_path'], Folder_Name)
+        payload['photo_path'] = photo_url
     except ValidationError as err:
         # print the error
         print(err.messages)
+    try:
+    
+     userRepository.create(payload)
+     # create token
+     user = userRepository.get_by_email(payload['email'])
+     token = jwt.encode({'id': user.id}, 'secret')
+     return {'token': token}
+    #  return jsonify({'message': 'registered successfully'})
+    except IntegrityError :
+        db.session.rollback()
+        return jsonify({'message': 'This user already Exists!'}, 403)
 
 
 @user_bp.post('/login')
@@ -102,52 +140,80 @@ def login():
             print(err.messages)
     return Response({"Wrong Password/Email"}, status=403)
 
+@user_bp.get('/getuser')
+@token_required
+def getuser():
+    current_user = userRepository.get_by_id(request.current_user.id)
+    print(current_user)
+    return get_user_scheme.dump(current_user)
 
-@user_bp.post('/imageupload')
-def test():
-    file = request.files['file']
-    file_name = secure_filename(file.filename)
-    file_path = UPLOAD_FOLDER + file.filename
-    file.save(UPLOAD_FOLDER + file_name)
-    print(file_path)
-    return {'message': 'uploaded successfully'}
+@user_bp.patch('/patchuser')
+@token_required
+def patchuser():
+    user = userRepository.patch(request.current_user.id,request.json)
+    return get_user_scheme.dump(user)
+
+@user_bp.patch('/changephoto')
+@token_required
+def changephoto():
+    user = userRepository.changephoto(request.current_user.id,request.json["img"])
+    return get_user_scheme.dump(user)
 
 
-@user_bp.post('/EmailSend')
+
+# @user_bp.post('/imageupload')
+# def test():
+#     file = request.files['file']
+#     file_name = secure_filename(file.filename)
+#     file_path = UPLOAD_FOLDER + file.filename
+#     file.save(UPLOAD_FOLDER + file_name)
+#     print(file_path)
+#     return {'message': 'uploaded successfully'}
+
+
+@user_bp.post('/sendOTP')
 def reset():
     try:
-
-        payload = request.get_json()['user']
+        payload = request.get_json()
         user = UserRepository().get_by_email(payload['email'])
+        # current_user = request.current_user
         errors = codetoEmailSend_validation_schema.validate(payload)
         channel = payload['channel']
+        # if not current_user.id==user.id:
+        #     return jsonify({"message":"User not valid"}),403
 
         if errors:
             return errors, 422
         if user is None:
-            return {'message': 'wrong email address , please send a correct email address'}
+            return jsonify({'message': 'wrong email address , please send a correct email address'}), 403
+    except KeyError as Ke:
+        return {'message': "please send your "+str(Ke)}
 
+    try:
         phone_number = user.phone
         client.verify \
             .services(VERIFY_SERVICE_SID) \
             .verifications \
             .create(to=phone_number, channel=channel)
-        return {'message': 'sent successfully'}
-    except KeyError as Ke:
-        return {'message': "please send your "+str(Ke)}
+        return jsonify({'message': 'sent successfully'})
+    except TwilioRestException as e:
+        print(e)
+        return "Error validating code: {}".format(e)
 
 
 @user_bp.post('/verify')
+@token_required
 def verify():
 
     try:
-        payload = request.get_json()['user']
+        payload = request.get_json()
+        current_user = request.current_user
 
         ValidationError = verify_validation_schema.validate(payload)
+        user = UserRepository().get_by_id(current_user.id)
         if ValidationError:
             return ValidationError, 422
 
-        user = UserRepository().get_by_email(payload['email'])
         if user is None:
             return {'message': 'wrong email address , please send a correct email address'}
         phone_number = user.phone
@@ -177,17 +243,17 @@ def verify():
 
 
 @user_bp.post('/newpass')
+@token_required
 def newpass():
-    payload = request.get_json()['user']
+    payload = request.get_json()
+    current_user = request.current_user
+
+    user = User.query.filter_by(id=current_user.id).first()
+
     errors = newpass_validation_schema.validate(payload)
-    token = request.headers['x-access-token']
     if errors:
         return errors, 422
-    elif not token:
-        return {"message": "Token is required!"}
 
-    token = jwt.decode(token, 'secret', algorithms=['HS256'])
-    user = User.query.filter_by(id=token['id']).first()
     if user is None:
         return{"message": "No record found with this email. please signup first"}
     user.password = generate_password_hash(payload['password']).decode('utf-8')
@@ -209,9 +275,10 @@ def newpass():
 #        if len(number)<8:
 #          number=number+str(random(8-len(number)))
 #        return number[:8]
-@user_bp.get('/closefriendslocations/<int:id>')
-def get_close_friends_locations(id):
-
+@user_bp.get('/closefriendslocations')
+@token_required
+def get_close_friends_locations():
+    id = request.current_user.id
     users = userRepository.get_close_friends_locations(id)
     # print(users)
     return locationschema.dump(users)
