@@ -100,7 +100,8 @@ def geUsermemos():
     if not USERmemos:
                 return jsonify({'message' : 'No memory found!'})
 
-    return memoryManyschema.dump(USERmemos)
+    # return memoryManyschema.dump(USERmemos)
+    return {"ok":"good"}
 
 @user_memories_bp.get('/memoget/<memo_id>') #get specific memo of current user
 @token_required
