@@ -143,15 +143,21 @@ def patch(memo_id):
     return memoryschema.dump(result)
 
 @user_memories_bp.delete('/memodel/<memo_id>')
-# @token_required
+@token_required
 def delete(memo_id):
     current_user = request.current_user
     memo = MemoryModel.query.filter_by(id=memo_id, user_id=current_user.id).first()
     if not memo:
         return {'message' : ' memory not found for the current user!'}
+    print(f"Deleting memory with id {memo.id}")
     result = memoryRepository.delete(memo.id)
+    print(f"Result: {result}")
     if(result):
-        return jsonify({"the following memory id is deleted" :f"{memo.id}"}),404
+        return jsonify({"the following memory id is deleted" :f"{memo.id}"}), 200
+    else:
+        return jsonify({"the following memory is not found" :f"{memo.id}"}), 404
+
+
 
 @user_memories_bp.delete('/deletecaregiver/<memo_id>') #delete caregivers 
 @token_required
