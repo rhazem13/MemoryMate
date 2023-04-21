@@ -22,7 +22,7 @@ from flask_migrate import Migrate
 from flask_marshmallow import Marshmallow
 from services.EventEmitter.event_emitter import EventEmitter
 
-# from routes.AlzhemerRoutes import ALZhemer
+from routes.AlzhemerRoutes import ALZhemer
 from routes.FaceRecognationRoutes import FaceRecognation
 from repositories.userAgendaRepository import UserAgendaRepository
 from services.redis.redis import RedisService
@@ -58,7 +58,7 @@ app.register_blueprint(memories_pics_bp, url_prefix='/memopics')
 app.register_blueprint(user_face_bp, url_prefix='/userfaces')
 app.register_blueprint(events_bp, url_prefix='/events')
 app.register_blueprint(caring_bp, url_prefix='/caring')
-#app.register_blueprint(ALZhemer, url_prefix='/Alzahemer')
+app.register_blueprint(ALZhemer, url_prefix='/Alzahemer')
 app.register_blueprint(FaceRecognation, url_prefix='/Face')
 
 
