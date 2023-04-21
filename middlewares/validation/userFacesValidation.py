@@ -4,7 +4,7 @@ from repositories.userRepository import UserRepository
 class UserFacesSchema(Schema):
     class Meta:
         fields = ("user_id","file" ,"name","bio")
-    user_id = fields.Integer(required=True)
+    user_id = fields.Integer(required=False)
     file = marshmallow.fields.Raw(type='file' , required=False)
     name = fields.String(required=True)
     bio = fields.String(required=True)

@@ -10,6 +10,9 @@ import base64
 from PIL import Image
 from io import BytesIO
 from middlewares.auth import token_required
+import jwt
+from flask import request, jsonify
+from functools import wraps
 FaceRecognation = Blueprint('Face', __name__)
 
 @FaceRecognation.route('/Save' , methods=['POST'])
@@ -128,7 +131,8 @@ def Recognation():
 @token_required
 def RecognationBase64():
     def TestFaces(test_image):
-        path = f"static/faces/{user_id}/"
+        # path = f"static/faces/{user_id}/"
+        path = f"static/faces/"
 
         known_names = []
         known_name_encodings = []
@@ -165,31 +169,38 @@ def RecognationBase64():
             font = cv2.FONT_HERSHEY_DUPLEX
             cv2.putText(image, name, (left + 6, bottom - 6), font, 1.0, (255, 255, 255), 1)
 
-     
         # cv2.imwrite("MachineLearning/Face_Recognation/output.jpg", image)
-       
 
-        return {"The Person is": name}
+        if 'x-access-token' in request.headers:
+            token = request.headers['x-access-token']
+
+        if not token:
+            print('not token')
+            return jsonify({'message' : 'Token is missing!'}), 401
+        data = jwt.decode(token,'secret', algorithms=['HS256'])
+        bio = data['bio']
+
+        return {"The Person is": name , "The Relation is" : bio}
     
 
     if 'pic' not in request.json:
         resp = jsonify({'message':'No file part in the request'})
         resp.status_code=400
         return resp
-    if 'id' not in request.json:
-        resp = jsonify({'message':'No User Id part in the request'})
-        resp.status_code=400
-        return resp
+    # if 'id' not in request.json:
+    #     resp = jsonify({'message':'No User Id part in the request'})
+    #     resp.status_code=400
+    #     return resp
 
     
     pic =request.json['pic']
-    user_id =request.json['id']
-    os.path.isdir(f'static/faces/{user_id}')
+    # user_id =request.json['id']
+    # os.path.isdir(f'static/faces/{user_id}')
 
-    if os.path.isdir(f'static/faces/{user_id}') == False:
-        resp = jsonify({'message':'user id not found'})
-        resp.status_code=400
-        return resp
+    # if os.path.isdir(f'static/faces/{user_id}') == False:
+    #     resp = jsonify({'message':'user id not found'})
+    #     resp.status_code=400
+    #     return resp
 
 
 
