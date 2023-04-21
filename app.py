@@ -23,7 +23,7 @@ from flask_marshmallow import Marshmallow
 from services.EventEmitter.event_emitter import EventEmitter
 
 # from routes.AlzhemerRoutes import ALZhemer
-# from routes.FaceRecognationRoutes import FaceRecognation
+from routes.FaceRecognationRoutes import FaceRecognation
 from repositories.userAgendaRepository import UserAgendaRepository
 from services.redis.redis import RedisService
 from services.socket.socket import SocketService
@@ -34,8 +34,6 @@ import time
 import atexit
 import pickle
 from apscheduler.schedulers.background import BackgroundScheduler
-#from routes.AlzhemerRoutes import ALZhemer
-#from routes.FaceRecognationRoutes import FaceRecognation
 load_dotenv()
 app = Flask(__name__)
 CORS(app, resources={r'/*': {'origins': '*'}})

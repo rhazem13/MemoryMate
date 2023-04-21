@@ -55,7 +55,7 @@ def post():
 
     pic =request.json['file']
   
-    os.mkdir(f'static/faces/{user_id}')
+    # os.mkdir(f'static/faces/{user_id}')
 
 
     starter = pic.find(',')
@@ -63,7 +63,9 @@ def post():
     image_data = bytes(image_data, encoding="ascii")
     im = Image.open(BytesIO(base64.b64decode(image_data)))
         
-    img_path =  f"static/faces/{user_id}/{name}.jpg" 
+    # img_path =  f"static/faces/{user_id}/{name}.jpg" 
+    img_path =  f"static/faces/{name}.jpg" 
+
     im.save(img_path)
 
 
