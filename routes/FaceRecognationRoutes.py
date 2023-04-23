@@ -131,7 +131,6 @@ def Recognation():
 @token_required
 def RecognationBase64():
     def TestFaces(test_image):
-        # path = f"static/faces/{user_id}/"
         path = f"static/faces/"
 
         known_names = []
@@ -169,7 +168,7 @@ def RecognationBase64():
             font = cv2.FONT_HERSHEY_DUPLEX
             cv2.putText(image, name, (left + 6, bottom - 6), font, 1.0, (255, 255, 255), 1)
 
-        # cv2.imwrite("MachineLearning/Face_Recognation/output.jpg", image)
+      
 
         if 'x-access-token' in request.headers:
             token = request.headers['x-access-token']
@@ -177,6 +176,7 @@ def RecognationBase64():
         if not token:
             print('not token')
             return jsonify({'message' : 'Token is missing!'}), 401
+        
         data = jwt.decode(token,'secret', algorithms=['HS256'])
         bio = data['bio']
 
@@ -187,22 +187,9 @@ def RecognationBase64():
         resp = jsonify({'message':'No file part in the request'})
         resp.status_code=400
         return resp
-    # if 'id' not in request.json:
-    #     resp = jsonify({'message':'No User Id part in the request'})
-    #     resp.status_code=400
-    #     return resp
 
     
     pic =request.json['pic']
-    # user_id =request.json['id']
-    # os.path.isdir(f'static/faces/{user_id}')
-
-    # if os.path.isdir(f'static/faces/{user_id}') == False:
-    #     resp = jsonify({'message':'user id not found'})
-    #     resp.status_code=400
-    #     return resp
-
-
 
     imgdata = base64.b64decode(pic)
     filename = 'some_image.jpg'
