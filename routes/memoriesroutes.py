@@ -30,12 +30,12 @@ def allowed_file(filename):
 def post():
     current_user = request.current_user
     errors= MemorySchema().validate(request.json)
-    
     if errors:
         return errors, 422
     payload =MemorySchema().load(request.json)
-    if not current_user.id==payload['user_id']:
-        return jsonify({'message' : 'not a valid user'},403)
+    # if not current_user.id==payload['user_id']:
+        # return jsonify({'message' : 'not a valid user'},403)
+    payload['user_id']=current_user.id
     
     # if 'thumbnail' not in request.files:
     #     resp=jsonify({'message' : 'No thumbnail image  in the request'})
@@ -100,7 +100,8 @@ def geUsermemos():
     if not USERmemos:
                 return jsonify({'message' : 'No memory found!'})
 
-    return memoryManyschema.dump(USERmemos)
+    return {"memories":memoryManyschema.dump(USERmemos)}
+    # return {"ok":"good"}
 
 @user_memories_bp.get('/memoget/<memo_id>') #get specific memo of current user
 @token_required
@@ -128,14 +129,14 @@ def getuser():
 @token_required
 def patch(memo_id):
     current_user = request.current_user
-    errors= memoryschema.validate(request.form,partial=True)
+    errors= memoryschema.validate(request.json,partial=True)
     if errors:
         return errors, 422
     memo = MemoryModel.query.filter_by(id=memo_id, user_id=current_user.id).first()
     if not memo:
-
          return {'message' : ' memory  not found for the current user!'}
-    payload = MemorySchema().load(request.form,partial=True)
+    payload = MemorySchema().load(request.json,partial=True)
+    print(payload)
     result=memoryRepository.update(payload,memo_id)
     if not result:
         return "memory can't be updated",404
@@ -148,9 +149,15 @@ def delete(memo_id):
     memo = MemoryModel.query.filter_by(id=memo_id, user_id=current_user.id).first()
     if not memo:
         return {'message' : ' memory not found for the current user!'}
+    print(f"Deleting memory with id {memo.id}")
     result = memoryRepository.delete(memo.id)
+    print(f"Result: {result}")
     if(result):
-        return jsonify({"the following memory id is deleted" :f"{memo.id}"}),404
+        return jsonify({"the following memory id is deleted" :f"{memo.id}"}), 200
+    else:
+        return jsonify({"the following memory is not found" :f"{memo.id}"}), 404
+
+
 
 @user_memories_bp.delete('/deletecaregiver/<memo_id>') #delete caregivers 
 @token_required

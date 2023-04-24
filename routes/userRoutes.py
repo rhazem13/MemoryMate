@@ -275,9 +275,10 @@ def newpass():
 #        if len(number)<8:
 #          number=number+str(random(8-len(number)))
 #        return number[:8]
-@user_bp.get('/closefriendslocations/<int:id>')
-def get_close_friends_locations(id):
-
+@user_bp.get('/closefriendslocations')
+@token_required
+def get_close_friends_locations():
+    id = request.current_user.id
     users = userRepository.get_close_friends_locations(id)
     # print(users)
     return locationschema.dump(users)
