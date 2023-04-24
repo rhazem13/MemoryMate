@@ -17,6 +17,7 @@ def post():
     if errors:
         return errors, 422
     payload =UserAgendaSchema().load(request.json)
+    payload['user_id']=request.current_user.id
     if('id' in payload):
         return "Id field shouldn't be entered",422
     return singleSchema.dump(agendaRepository.create(payload))
