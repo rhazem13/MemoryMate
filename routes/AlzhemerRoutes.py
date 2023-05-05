@@ -1,7 +1,5 @@
 
-import cv2
-import numpy as np
-from MachineLearning.Alzahemer_Detection.Alzhemer import prediction
+from MachineLearning.Alzahemer_Detection.AlzahiemerDetection import predict
 from flask import request, jsonify, Blueprint 
 import base64
 from PIL import Image
@@ -23,7 +21,7 @@ def Predicit():
          #  "Alzhiemer/Tests/" +
          pic.save(img_path)
 
-         predict_result = prediction(img_path)
+         predict_result = predict(img_path)
 
          data = {
             "result": predict_result
@@ -49,7 +47,7 @@ def PredicitBase64():
 
          
 
-         predict_result = prediction(image)
+         predict_result = predict(image)
 
          
          return predict_result
