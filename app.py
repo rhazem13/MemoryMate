@@ -114,6 +114,6 @@ if __name__ == '__main__':
         redis_client.delete(f"agenda-{agenda_id}")
         UserAgendaRepository.updateAgendaStartTimeWithInterval(
             data['agenda_id'])
-    app.run(host="0.0.0.0", debug=True, use_reloader=False)
+    app.run(host="0.0.0.0", debug=True, use_reloader=True)
 print('starting socket')
 #socketio.run(app, debug = True, host='127.0.0.1')

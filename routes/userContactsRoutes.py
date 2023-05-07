@@ -1,6 +1,7 @@
 from flask import request, Blueprint
 from flask_restful import abort
 from repositories.contactsRepository import ContactsRepository
+from repositories.userRepository import UserRepository
 from middlewares.validation.userContactsValidation import UserContactsSchema
 from middlewares.auth import token_required
 
@@ -8,15 +9,20 @@ user_contacts_bp = Blueprint('usercontacts', __name__)
 manySchema = UserContactsSchema(many=True)
 singleSchema = UserContactsSchema()
 contactsRepository = ContactsRepository()
+userRepository = UserRepository()
 
 
 @user_contacts_bp.post('')
-# @token_required
+@token_required
 def post():
-
     errors = singleSchema.validate(request.get_json())
     if errors:
         return errors, 422
+    id = request.current_user.id
+    caregiver = userRepository.get_by_email(request.json['email'])
+    request.json['user_id'] = id
+    request.json['contact_id'] = caregiver.id
+    return request.json
     payload = UserContactsSchema().load(request.json)
     if('id' in payload):
         return "Id field shouldn't be entered", 422
