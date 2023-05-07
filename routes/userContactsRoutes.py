@@ -28,6 +28,7 @@ def post():
 def getPatients():
     id = request.current_user.id
     result = contactsRepository.findByContactId(id)
+    print(result)
     return manySchema.dump(result)
 
 
@@ -36,6 +37,7 @@ def getPatients():
 def getCaregivers():
     id = request.current_user.id
     result = contactsRepository.findByUserId(id)
+
     return manySchema.dump(result)
 
 
