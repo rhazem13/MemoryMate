@@ -20,10 +20,10 @@ def post():
         return errors, 422
     id = request.current_user.id
     caregiver = userRepository.get_by_email(request.json['email'])
-    request.json['user_id'] = id
-    request.json['contact_id'] = caregiver.id
-    return request.json
     payload = UserContactsSchema().load(request.json)
+    del payload['email']
+    payload['user_id'] = id
+    payload['contact_id'] = caregiver.id
     if('id' in payload):
         return "Id field shouldn't be entered", 422
     return singleSchema.dump(contactsRepository.create(payload))
