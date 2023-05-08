@@ -34,7 +34,7 @@ def predict(image):
     probability = round(np.max(model.predict(test_image)*100),2)
     probability /=100
   
-    if probability < 1.0:
+    if probability != 1.0:
         Brain = str('%.2f' % (probability * 100) + '% Alzhemer')
     else:
         Brain = str('%.2f' % ((1 - probability) * 100) + '% NonAlzhemer')
