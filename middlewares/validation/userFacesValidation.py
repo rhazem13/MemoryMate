@@ -3,9 +3,9 @@ import marshmallow
 from repositories.userRepository import UserRepository
 class UserFacesSchema(Schema):
     class Meta:
-        fields = ("user_id","file" ,"name","bio")
+        fields = ("user_id","face_url" ,"name","bio")
     user_id = fields.Integer(required=False)
-    file = marshmallow.fields.Raw(type='file' , required=False)
+    # file = marshmallow.fields.Raw(type='file' , required=False)
     name = fields.String(required=True)
     bio = fields.String(required=True)
 # "id","user_id","face_url",
