@@ -36,24 +36,25 @@ def getz(id):
 def post():
     
     user_id = request.current_user.id
-    name = request.current_user.id
-    errors= singleSchema.validate(request.form)
+    name = request.json['name']
+    bio = request.json['bio']
+    errors= singleSchema.validate(request.json)
    
     if errors:
         return errors, 422
-    payload =UserFacesSchema().load(request.form)
+    payload =UserFacesSchema().load(request.json)
 
     if('id' in payload):
         return "Id field shouldn't be entered",422
     
     
     
-    if 'file' not in request.json:
+    if 'face_url' not in request.json:
         resp = jsonify({'message':'No file part in the request'})
         resp.status_code=400
         return resp
 
-    pic =request.json['file']
+    pic =request.json['face_url']
   
 
 
@@ -73,11 +74,17 @@ def post():
     payload['user_id'] = user_id
 
     payload['name'] = name
+    payload['bio'] = bio
+
 
     resp=jsonify({'message' : 'face uploaded suecessfully'})
     resp.status_code=201
 
-    return singleSchema.dump(facesRepository.create(payload))
+    singleSchema.dump(facesRepository.create(payload))
+
+    return resp
+
+    
 
 
 @user_face_bp.get('')
