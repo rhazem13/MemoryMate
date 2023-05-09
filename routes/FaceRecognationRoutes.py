@@ -13,7 +13,8 @@ from middlewares.auth import token_required
 import jwt
 from flask import request, jsonify
 from functools import wraps
-
+from repositories.userFacesRepository import UserfacesRepository
+from middlewares.validation.userFacesValidation import UserFacesSchema
 FaceRecognation = Blueprint('Face', __name__)
 
 @FaceRecognation.route('/Save' , methods=['POST'])
@@ -82,7 +83,7 @@ def Recognation():
        
         image = cv2.imread(test_image)
         
-
+            
         face_locations = fr.face_locations(image)
         face_encodings = fr.face_encodings(image, face_locations)
 
@@ -126,7 +127,8 @@ def Recognation():
          
          return predict_result
     
-
+singleSchema=UserFacesSchema()
+facesRepository= UserfacesRepository()
 
 @FaceRecognation.route('/RecBase64', methods=['POST']) 
 @token_required
@@ -180,10 +182,16 @@ def RecognationBase64():
         
         # data = jwt.decode(token,'secret', algorithms=['HS256'])
         # bio = data['bio']
+        # try:
+        # return singleSchema.dump(facesRepository.get_by_User_id(15))
+        # except:
+        #     return {"UnKnown Person"}
 
-       
+    
+
 
         return {"Name":name}
+    
         #return {"The Person is": name}
     
 
@@ -204,5 +212,5 @@ def RecognationBase64():
     predict_result = TestFaces(filename)
 
 
-    return jsonify({"Person Info": predict_result, 'Image':  '../some_image.jpg'})
+    return jsonify({"Person Info": predict_result})
     return predict_result

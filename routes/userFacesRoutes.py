@@ -1,5 +1,6 @@
 from flask import jsonify, request, Blueprint
 from flask_restful import abort
+from models.UserFaces.userfacesModel import UserfacesModel
 from repositories.userFacesRepository import UserfacesRepository
 from middlewares.validation.userFacesValidation import UserFacesSchema
 from middlewares.auth import token_required
