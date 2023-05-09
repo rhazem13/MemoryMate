@@ -13,6 +13,7 @@ from middlewares.auth import token_required
 import jwt
 from flask import request, jsonify
 from functools import wraps
+
 FaceRecognation = Blueprint('Face', __name__)
 
 @FaceRecognation.route('/Save' , methods=['POST'])
@@ -127,11 +128,11 @@ def Recognation():
     
 
 
-@FaceRecognation.route('/RecBase64', methods=['POST'])
+@FaceRecognation.route('/RecBase64', methods=['POST']) 
 @token_required
 def RecognationBase64():
     def TestFaces(test_image):
-        path = f"static/faces/"
+        path = "static/faces/Images/"
 
         known_names = []
         known_name_encodings = []
@@ -170,17 +171,20 @@ def RecognationBase64():
 
       
 
-        if 'x-access-token' in request.headers:
-            token = request.headers['x-access-token']
+        # if 'x-access-token' in request.headers:
+        #     token = request.headers['x-access-token']
 
-        if not token:
-            print('not token')
-            return jsonify({'message' : 'Token is missing!'}), 401
+        # if not token:
+        #     print('not token')
+        #     return jsonify({'message' : 'Token is missing!'}), 401
         
-        data = jwt.decode(token,'secret', algorithms=['HS256'])
-        bio = data['bio']
+        # data = jwt.decode(token,'secret', algorithms=['HS256'])
+        # bio = data['bio']
 
-        return {"The Person is": name , "The Relation is" : bio}
+       
+
+        return {"Name":name}
+        #return {"The Person is": name}
     
 
     if 'pic' not in request.json:
@@ -200,5 +204,5 @@ def RecognationBase64():
     predict_result = TestFaces(filename)
 
 
-    
+    return jsonify({"Person Info": predict_result, 'Image':  '../some_image.jpg'})
     return predict_result

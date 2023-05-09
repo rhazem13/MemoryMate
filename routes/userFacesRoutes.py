@@ -64,7 +64,7 @@ def post():
     im = Image.open(BytesIO(base64.b64decode(image_data)))
         
 
-    img_path =  f"static/faces/{name}.jpg" 
+    img_path =  f"static/faces/Images/{name}.jpg" 
 
     im.save(img_path)
 
