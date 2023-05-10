@@ -9,12 +9,12 @@ class ContactsRepository(Repository):
         super().__init__(UserContacts)
 
     def findByUserId(self, user_id):
-        result = UserContacts.query.join(User, User.id == UserContacts.user_id).add_columns(User.full_name, User.email, User.address, User.phone, UserContacts.contact_id, UserContacts.relation, UserContacts.bio).filter(
+        result = UserContacts.query.join(User, User.id == UserContacts.contact_id).add_columns(User.photo_path ,UserContacts.id ,UserContacts.user_id,User.full_name, User.email, User.address, User.phone, UserContacts.contact_id, UserContacts.relation, UserContacts.bio).filter(
             UserContacts.user_id == user_id).all()
         return result
 
     def findByContactId(self, contact_id):
-        result = UserContacts.query.join(User, User.id == UserContacts.contact_id).add_columns(User.full_name, User.email, User.address, User.phone, UserContacts.user_id, UserContacts.relation).filter(
+        result = UserContacts.query.join(User, User.id == UserContacts.user_id).add_columns(User.photo_path ,UserContacts.id, UserContacts.contact_id ,UserContacts.user_id, User.full_name, User.email, User.address, User.phone, UserContacts.user_id, UserContacts.relation).filter(
             UserContacts.contact_id == contact_id).all()
         return result
 
