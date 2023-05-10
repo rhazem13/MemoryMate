@@ -17,6 +17,10 @@ class ContactsRepository(Repository):
         result = UserContacts.query.join(User, User.id == UserContacts.user_id).add_columns(User.photo_path ,UserContacts.id, UserContacts.contact_id ,UserContacts.user_id, User.full_name, User.email, User.address, User.phone, UserContacts.user_id, UserContacts.relation).filter(
             UserContacts.contact_id == contact_id).all()
         return result
+    
+    def findByUserIdAndContactId(self, user_id, contact_id):
+        result = UserContacts.query.filter(UserContacts.user_id == user_id, UserContacts.contact_id == contact_id).all()
+        return result
 
     def get_patients_ids(self, id):
         # getting patients ids by caregiver id
