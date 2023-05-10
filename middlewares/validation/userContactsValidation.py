@@ -6,7 +6,7 @@ from models.UserContacts.relationLevelEnum import ERelationLevel
 class UserContactsSchema(Schema):
     class Meta:
         fields = ("id", "user_id", "contact_id", "relation",
-                  "bio", "email", "phone", "full_name", "address")
+                  "bio", "email", "phone", "full_name", "address", "photo_path")
     # user_id = fields.Integer(required=True)
     # contact_id = fields.Integer(required=True)\
     email = fields.Email(required=True)
