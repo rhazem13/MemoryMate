@@ -20,6 +20,13 @@ def post():
         return errors, 422
     id = request.current_user.id
     caregiver = userRepository.get_by_email(request.json['email'])
+    if caregiver.user_type == "PATIENT":
+        return "You can add only caregivers not patyines", 400
+    if request.current_user.user_type !="PATIENT":
+        return "You are not a patient", 400
+    contacts = contactsRepository.findByUserIdAndContactId(id, caregiver.id)
+    if len(contacts) > 0:
+        return "You entered this caregiver before", 409
     payload = UserContactsSchema().load(request.json)
     del payload['email']
     payload['user_id'] = id
