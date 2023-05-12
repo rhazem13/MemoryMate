@@ -70,3 +70,16 @@ def get_waypoints():
         new_row['lat'] = json_geom[0]
         new_row['lng'] = json_geom[1]
     return manySchema.dump(result_arr)
+
+
+@user_location_bp.get("<int:id>")
+@token_required
+def getUserLocation(id):
+    current_user = request.current_user
+    if(current_user.user_type=="PATIENT"):
+        result = locationRepository.get_waypointsOfCaregiver(current_user.id, id)
+    else:
+        result = locationRepository.get_waypointsOfPatient(id, current_user.id)
+    json_geom = json.loads(result[0].geom)['coordinates']
+    new_result = {"bio":result[0].bio, "full_name":result[0].full_name, "lat":json_geom[0], "lng":json_geom[1]}
+    return singleSchema.dump(new_result)
