@@ -56,10 +56,15 @@ def delete(id):
 @token_required
 def get_waypoints():
     id = request.current_user.id
-    result = locationRepository.get_patients_location(id)
+    if request.current_user.user_type == "PATIENT":
+        result = locationRepository.get_caregivers_location(id)
+    else:
+        result = locationRepository.get_patients_location(id)
     result_arr = []
+    print(result)
     for row in result:
-        new_row = {"bio":row.bio, "full_name":row.full_name}
+        new_row = {"bio": row.bio, "full_name": row.full_name,
+                   "user_id": row.user_id}
         result_arr.append(new_row)
         json_geom = json.loads(row.geom)['coordinates']
         new_row['lat'] = json_geom[0]
