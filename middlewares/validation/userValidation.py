@@ -32,7 +32,7 @@ class CreateUserscheme(Schema):
     def get_location(self, obj):
         if(obj.location==None):
             return None
-        print(obj.location)
+        # print(obj.location)
         return json.loads(obj.location)
     def load_location(self, obj):
         return obj
