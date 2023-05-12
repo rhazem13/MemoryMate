@@ -19,11 +19,23 @@ class LocationRepository(Repository):
         return result
     
     def get_patients_location(self, id):
+        print('adasdasdasdasdasdsa')
+        result = UserLocationModel.query.distinct(UserLocationModel.user_id)\
+            .join(UserContacts, UserLocationModel.user_id == UserContacts.user_id)\
+            .join(User, User.id == UserContacts.user_id)\
+            .add_columns(User.full_name, User.id.label('user_id'), UserContacts.bio, func.ST_AsGeoJSON(func.ST_Envelope(UserLocationModel.geom)).label('geom'))\
+            .filter(UserContacts.contact_id == id)\
+            .group_by(UserLocationModel.user_id, UserLocationModel.id, UserContacts.id, User.id)\
+            .order_by(UserLocationModel.user_id, UserLocationModel.id.desc())\
+            .all()
+        return result
+    
+    def get_caregivers_location(self, id):
         result = UserLocationModel.query.distinct(UserLocationModel.user_id)\
             .join(UserContacts, UserLocationModel.user_id == UserContacts.contact_id)\
-            .join(User, User.id == UserContacts.user_id)\
-            .add_columns(User.full_name, UserContacts.bio, func.ST_AsGeoJSON(func.ST_Envelope(UserLocationModel.geom)).label('geom'))\
-            .filter(UserLocationModel.user_id == 5)\
+            .join(User, User.id == UserContacts.contact_id)\
+            .add_columns(User.full_name, User.id.label('user_id'), UserContacts.bio, func.ST_AsGeoJSON(func.ST_Envelope(UserLocationModel.geom)).label('geom'))\
+            .filter(UserContacts.user_id == id)\
             .group_by(UserLocationModel.user_id, UserLocationModel.id, UserContacts.id, User.id)\
             .order_by(UserLocationModel.user_id, UserLocationModel.id.desc())\
             .all()
