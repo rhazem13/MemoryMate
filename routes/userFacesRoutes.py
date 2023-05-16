@@ -65,12 +65,17 @@ def post():
     im = Image.open(BytesIO(base64.b64decode(image_data)))
         
 
-    img_path =  f"static/faces/Images/{name}.jpg" 
+    img_path =  f"static/faces/Images/{name}.jpg"
+
+
+
 
     im.save(img_path)
 
+    Images = photoService.addPhoto(img_path  , "faces")
 
-    payload['face_url']=img_path 
+
+    payload['face_url']= Images 
 
     payload['user_id'] = user_id
 

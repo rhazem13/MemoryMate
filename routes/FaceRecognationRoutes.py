@@ -104,7 +104,7 @@ def Recognation():
             font = cv2.FONT_HERSHEY_DUPLEX
             cv2.putText(image, name, (left + 6, bottom - 6), font, 1.0, (255, 255, 255), 1)
 
-     
+        Encoded = base64.b64encode(image)
         # cv2.imwrite("MachineLearning/Face_Recognation/output.jpg", image)
        
 
