@@ -15,4 +15,5 @@ class PhotoService:
     
     def addPhoto(self, photo,destFolder):
         upload_result = cloudinary.uploader.upload(photo,folder=destFolder)
+        print(upload_result)
         return upload_result['secure_url']
