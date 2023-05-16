@@ -51,3 +51,8 @@ geojson==3.0.1
 keras==2.8.0
 Keras-Preprocessing==1.1.2
 numpy==1.22.0
+
+gunicorn==20.1.0
+cloudinary==1.32.0
+flask_cors==3.0.10
+apscheduler==3.10.0
