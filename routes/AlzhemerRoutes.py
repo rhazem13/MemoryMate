@@ -1,21 +1,15 @@
-import os
-from tkinter import Image
-from urllib import response
-from MachineLearning.Alzahemer_Detection.Alzhemer import prediction
-from flask import Flask, request, jsonify,Response, Blueprint
-from flask import Flask, render_template, request
-import pandas as pd
-import cv2
-import numpy as np
-import base64
-from werkzeug.utils import secure_filename
 
+from MachineLearning.Alzahemer_Detection.AlzahiemerDetection import predict
+from flask import request, jsonify, Blueprint 
+import base64
+from PIL import Image
+from io import BytesIO
 
 ALZhemer = Blueprint('Alzahemer', __name__)
 
 
 
-@ALZhemer.route('/Predict', methods=['GET' , 'POST'])
+@ALZhemer.route('/Predict', methods=['POST'])
 def Predicit():
     if  request.method == 'POST':
          if 'pic' not in request.files:
@@ -23,11 +17,11 @@ def Predicit():
             resp.status_code=400
             return resp
          pic =request.files['pic']
-         img_path =  "Alzhiemer/Tests/" + pic.filename
-          
+         img_path =   pic.filename
+         #  "Alzhiemer/Tests/" +
          pic.save(img_path)
 
-         predict_result = prediction(img_path)
+         predict_result = predict(img_path)
 
          data = {
             "result": predict_result
@@ -38,7 +32,25 @@ def Predicit():
          return predict_result
 
 
-     
+@ALZhemer.route('/sendBase64', methods=['POST'])
+def PredicitBase64():
+         pic =request.json['pic']
+
+         starter = pic.find(',')
+         image_data = pic[starter+1:]
+         image_data = bytes(image_data, encoding="ascii")
+         image = BytesIO(base64.b64decode(image_data))
+         im = Image.open(BytesIO(base64.b64decode(image_data)))
+         
+         #im.save('image.jpg')
+       
+
+         
+
+         predict_result = predict(image)
+
+         
+         return predict_result
                
 
             
