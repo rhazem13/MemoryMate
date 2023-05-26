@@ -43,26 +43,3 @@
 >We are working on making this app convenient and useful for all Alzheimer's patients we also work on reporting and data. More accurate and professional processing. We hope to improve Security and performance of the application and making the application competitive with it all global therapeutic applications. So, there are several steps and stages that we hope to develop In the future, like adding more treatment than removing chronic and intractable diseases as an alternative solution, and also for all categories of patients. Make the app more inclusive More than one medical field makes the app more effective and usable from many categories and increases the number of users to request. The use of data science techniques and artificial intelligence in our application makes reports more accurate and professional, and helps the patient's relatives and companions to follow up their patient well. Optimal use of data and analytics will also ensure that improvements are kept up to date on an ongoing basis as a result of the overall vision and measure. Key operational metrics. Use plans and methods that make the application appropriate and Compatible with all Alzheimer's patients we will make the application support English and In addition to the Arabic language that will provide an interface the number of application users. Our main goal is to treat Alzheimer's patients and find a real cure for them instead of going back or forth to the doctor in vain Test the application with 70-100 patients and collect their feedback with them. With interactions automatically generated and analyzed to produce a paper that discusses our experience with the results we found.
 
 
-## License
-
-MIT License
-
-Copyright (c) 2023 Moamen Ashraf Muhammed
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
