@@ -1,50 +1,27 @@
-from models.Memories.memoryPicsModel import MemoPictures
-from models.user.userModel import User
-from repositories.repository import Repository
-from models.Memories.userMemoriesModel import MemoryModel
-
-from sqlalchemy import func
+from flask import abort
 from models.db import db
-import json
+from models.Memories.memoryPicsModel import MemoPictures
+from models.Memories.userMemoriesModel import MemoryModel
+from repositories.memoRepository import MemoryRepository
+from repositories.repository import Repository, current_user_id
+
 
 class MemoryPicsRepository(Repository):
-   def __init__(self):
+    def __init__(self):
         super().__init__(MemoPictures)
 
-   def create(self,value):
-        new_value = MemoPictures(**value)
-        db.session.add(new_value)
+    def owned_query(self):
+        return MemoPictures.query.join(MemoryModel).filter(
+            MemoryModel.user_id == current_user_id())
+
+    def readable_query(self):
+        return MemoPictures.query.filter(MemoPictures.memory_id.in_(
+            MemoryRepository().readable_query().with_entities(MemoryModel.id)))
+
+    def create(self, value):
+        if 'id' in value or MemoryRepository().get_by_id(value.get('memory_id')) is None:
+            abort(404)
+        picture = MemoPictures(**value)
+        db.session.add(picture)
         db.session.commit()
-        db.session.refresh(new_value)
-        return new_value
-
-   def get_all(self):
-        result = MemoPictures.query.all()
-        return result
-
-   def update(self,new_value,id):
-        old_value = MemoPictures.query.get(id)
-        if old_value is None:
-            return False
-        for key, value in new_value.items():
-            setattr(old_value, key, value)
-        db.session.commit()
-        return old_value
-
-   def delete(self,id):
-        old_value = MemoPictures.query.get(id)
-        if old_value is None:
-            return False
-        db.session.delete(old_value)
-        db.session.commit()
-        return True
-
-
-   def get_by_id(id):
-        result = MemoPictures.query.get(id)
-        return result
-   def get_by_memory_id(memory_id):
-        result = MemoryModel.query.get(memory_id)
-        return result
-   
-   
+        return picture

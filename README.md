@@ -10,7 +10,7 @@ A team project exploring memory aids, caregiver reminders, contacts, and locatio
 - Redis supports caching and session/socket coordination. Flask-SocketIO and the event emitter support real-time notifications.
 - Cloudinary handles photo uploads; Twilio supports verification.
 
-This is a historical prototype, not a production-ready healthcare application. The face-recognition and image-classification experiments have separate native/ML dependencies and are not medical diagnostic tools.
+This is a historical prototype, not a healthcare production system. The face-recognition and image-classification experiments have separate native/ML dependencies and are not medical diagnostic tools.
 
 ## Local setup
 
@@ -33,14 +33,29 @@ Enable PostGIS in the target database before running migrations. The legacy ML c
 
 Never commit `.env`, user photos, bearer tokens, or service credentials. Credentials exposed in earlier versions must be rotated; cleaning Git history does not revoke them. Existing tokens become invalid when the signing key changes.
 
-## Verification
+## Authorization boundaries
 
-The focused configuration and signing checks need Flask and PyJWT:
+The authenticated caller owns calendars, agendas, notifications, faces, and locations. Contact relationships are created by the patient; relationship IDs cannot be reassigned through a patch. Shared repository queries scope reads, updates, and deletes to the owner. Unauthorized and missing objects return 404; missing/invalid credentials return 401. Ownership fields supplied by a client are rejected.
+
+Memories and their pictures can also be read by explicitly granted caregivers. Only the memory owner can modify them or grant/revoke access, and a grant requires an existing caregiver contact. Contact-based location sharing is separate from memory sharing.
+
+Face images are stored below the application's private `instance/faces/<user>` directory and served through an authenticated owner-only route. Recognition searches that user's directory. Provider uploads accept validated base64 JPG/PNG content, not client-supplied file paths or remote URLs. Tokens expire after one hour; profile patches cannot change identity, credentials, or role.
+
+## Focused backend verification
+
+[Authorization tests](tests/test_authorization.py) exercise the actual Flask routes and SQLAlchemy queries against disposable PostgreSQL/PostGIS persistence. They cover owner/wrong-owner/missing-object behavior across six resources, list isolation, ownership spoofing, caregiver grants/revocation, picture access, private media, and token rejection. Configuration/signing and upload-path tests run alongside them.
 
 ```sh
-python -m unittest discover -s tests
-python -m compileall -q config.py middlewares routes services utils
+docker run -d --name memorymate-auth-test -p 127.0.0.1:55432:5432 \
+  -e POSTGRES_DB=memorymate_auth_test -e POSTGRES_HOST_AUTH_METHOD=trust postgis/postgis:16-3.5
+python -m pip install -r requirements-backend-test.txt
+export TEST_DATABASE_URL=postgresql://postgres@localhost:55432/memorymate_auth_test
+python -m pytest tests -q
 ```
+
+On PowerShell, set `$env:TEST_DATABASE_URL` instead of `export`. The tests reset only a database with the `memorymate_auth_test` suffix; never point them at application data. The trust-authenticated database above binds to loopback and is for disposable tests only.
+
+[Backend CI](.github/workflows/backend-tests.yml) uses Python 3.12 and a real PostGIS service. It validates these backend/security boundaries, not full application startup, provider integration, native ML inference, or the disabled reminder scheduler. The legacy application's dependency file remains separate from the focused test environment. Public Cloudinary URLs are not a private media access-control mechanism; production use would require a separate private asset delivery design.
 
 ## Contribution
 

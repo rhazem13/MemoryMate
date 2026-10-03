@@ -26,5 +26,4 @@ class ContactsRepository(Repository):
         # getting patients ids by caregiver id
         result = UserContacts.query.with_entities(
             UserContacts.user_id).filter(UserContacts.contact_id == id).all()
-        print(result)
         return result

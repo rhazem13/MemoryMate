@@ -20,6 +20,8 @@ def post():
         return errors, 422
     id = request.current_user.id
     caregiver = userRepository.get_by_email(request.json['email'])
+    if caregiver is None:
+        abort(404)
     if caregiver.user_type == "PATIENT":
         return "You can add only caregivers not patyines", 400
     if request.current_user.user_type !="PATIENT":
@@ -41,7 +43,6 @@ def post():
 def getPatients():
     id = request.current_user.id
     result = contactsRepository.findByContactId(id)
-    print(result)
     return manySchema.dump(result)
 
 

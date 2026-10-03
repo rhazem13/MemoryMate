@@ -8,5 +8,5 @@ import json
 class MemoryPicSchema(Schema):
 
     id=fields.Int(dump_only=True)
-    memory_id=fields.Int()
-    memoPic_path=fields.Str()
+    memory_id=fields.Int(required=True)
+    memoPic_path=fields.Str(required=True)

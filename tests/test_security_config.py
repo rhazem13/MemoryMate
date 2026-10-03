@@ -25,7 +25,8 @@ class SecurityConfigTests(unittest.TestCase):
         app.config.from_object(config)
         with app.app_context():
             token = encode_token({'id': 7})
-            self.assertEqual(decode_token(token), {'id': 7})
+            self.assertEqual(decode_token(token)['id'], 7)
+            self.assertIn('exp', decode_token(token))
             app.config['SECRET_KEY'] = 'different-test-only-signing-key-0002'
             with self.assertRaises(jwt.InvalidSignatureError):
                 decode_token(token)
