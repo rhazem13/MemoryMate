@@ -1,3 +1,6 @@
+from middlewares.auth import token_required
+from utils.uploads import image_path
+from tempfile import TemporaryDirectory
 
 from MachineLearning.Alzahemer_Detection.AlzahiemerDetection import predict
 from flask import request, jsonify, Blueprint 
@@ -10,6 +13,7 @@ ALZhemer = Blueprint('Alzahemer', __name__)
 
 
 @ALZhemer.route('/Predict', methods=['POST'])
+@token_required
 def Predicit():
     if  request.method == 'POST':
          if 'pic' not in request.files:
@@ -17,11 +21,10 @@ def Predicit():
             resp.status_code=400
             return resp
          pic =request.files['pic']
-         img_path =   pic.filename
-         #  "Alzhiemer/Tests/" +
-         pic.save(img_path)
-
-         predict_result = predict(img_path)
+         with TemporaryDirectory() as directory:
+             img_path = image_path(directory, pic.filename)
+             pic.save(img_path)
+             predict_result = predict(img_path)
 
          data = {
             "result": predict_result
@@ -33,6 +36,7 @@ def Predicit():
 
 
 @ALZhemer.route('/sendBase64', methods=['POST'])
+@token_required
 def PredicitBase64():
          pic =request.json['pic']
 

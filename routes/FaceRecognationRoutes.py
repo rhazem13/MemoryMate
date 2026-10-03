@@ -1,3 +1,4 @@
+from utils.uploads import image_path
 import os
 import face_recognition as fr
 import cv2
@@ -18,6 +19,7 @@ from middlewares.validation.userFacesValidation import UserFacesSchema
 FaceRecognation = Blueprint('Face', __name__)
 
 @FaceRecognation.route('/Save' , methods=['POST'])
+@token_required
 def SaveIamage():
      
       if 'file' not in request.files:
@@ -25,7 +27,7 @@ def SaveIamage():
             resp.status_code=400
             return resp
       pic =request.files['file']
-      img_path =  "MachineLearning/Face_Recognation/train/" + pic.filename
+      img_path = image_path("MachineLearning/Face_Recognation/train", f"{request.current_user.id}-{pic.filename}")
           
       pic.save(img_path)
 
@@ -36,6 +38,7 @@ def SaveIamage():
 
 
 @FaceRecognation.route('/SaveFaceBase64' , methods=['POST'])
+@token_required
 def SaveImageBase64():
      
       if 'file' not in request.json:
@@ -57,7 +60,7 @@ def SaveImageBase64():
       image = BytesIO(base64.b64decode(image_data))
       im = Image.open(BytesIO(base64.b64decode(image_data)))
         
-      im.save(f'MachineLearning/Face_Recognation/train/{Name}.jpg')
+      im.save(image_path("MachineLearning/Face_Recognation/train", f"{request.current_user.id}-{Name}.jpg"))
 
 
        
@@ -65,6 +68,7 @@ def SaveImageBase64():
       return jsonify("Image Saved Successfully")
 
 @FaceRecognation.route('/Rec', methods=['GET' , 'POST'])
+@token_required
 def Recognation():
     def TestFaces(test_image):
         path = "static/faces/Images/"
@@ -117,7 +121,7 @@ def Recognation():
             resp.status_code=400
             return resp
          pic =request.files['ph']
-         img_path =  "Faces/Tests/" + pic.filename
+         img_path = image_path("Faces/Tests", f"{request.current_user.id}-{pic.filename}")
           
          pic.save(img_path)
 
@@ -204,7 +208,7 @@ def RecognationBase64():
     pic =request.json['pic']
 
     imgdata = base64.b64decode(pic)
-    filename = 'some_image.jpg'
+    filename = image_path("Faces/Tests", f"{request.current_user.id}-capture.jpg")
 
     with open(filename, 'wb') as f:
      f.write(imgdata)
