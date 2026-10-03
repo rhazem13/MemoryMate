@@ -17,7 +17,7 @@ class CreateUserscheme(Schema):
     full_name = fields.Str(required=True, validate=Length(min=3,max=60)) 
     location = fields.Method("get_location", deserialize="load_location")
     email=fields.Email(required=True)
-    password=fields.Str(required=True,validate=Regexp(pass_regex))
+    password=fields.Str(required=True,validate=Regexp(pass_regex),load_only=True)
     photo_path =fields.Str()
     user_type=fields.Str(required=True,validate=OneOf(user_types))
     address=fields.Str(required=True,validate=Length(min=3))

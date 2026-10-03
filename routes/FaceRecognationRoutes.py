@@ -1,3 +1,4 @@
+from utils.images import face_directory, decode_image
 from utils.uploads import image_path
 import os
 import face_recognition as fr
@@ -27,7 +28,7 @@ def SaveIamage():
             resp.status_code=400
             return resp
       pic =request.files['file']
-      img_path = image_path("MachineLearning/Face_Recognation/train", f"{request.current_user.id}-{pic.filename}")
+      img_path = image_path(str(face_directory()), f"{request.current_user.id}-{pic.filename}")
           
       pic.save(img_path)
 
@@ -60,7 +61,7 @@ def SaveImageBase64():
       image = BytesIO(base64.b64decode(image_data))
       im = Image.open(BytesIO(base64.b64decode(image_data)))
         
-      im.save(image_path("MachineLearning/Face_Recognation/train", f"{request.current_user.id}-{Name}.jpg"))
+      im.save(image_path(str(face_directory()), f"{request.current_user.id}-{Name}.jpg"))
 
 
        
@@ -71,20 +72,28 @@ def SaveImageBase64():
 @token_required
 def Recognation():
     def TestFaces(test_image):
-        path = "static/faces/Images/"
+        path = str(face_directory()) + os.sep
 
         known_names = []
         known_name_encodings = []
         images = os.listdir(path)
+        if not images:
+            return {'Name': 'Unknown'}
         for _ in images:
                 image = fr.load_image_file(path + _)
                 image_path = path + _
-                encoding = fr.face_encodings(image)[0]
+                encodings = fr.face_encodings(image)
+                if not encodings:
+                    continue
+                encoding = encodings[0]
                 known_name_encodings.append(encoding)
                 known_names.append(os.path.splitext(os.path.basename(image_path))[0].capitalize())
 
                 
        
+        if not known_name_encodings:
+            return {'Name': 'Unknown'}
+        name = 'Unknown'
         image = cv2.imread(test_image)
         
             
@@ -138,20 +147,28 @@ facesRepository= UserfacesRepository()
 @token_required
 def RecognationBase64():
     def TestFaces(test_image):
-        path = "static/faces/Images/"
+        path = str(face_directory()) + os.sep
 
         known_names = []
         known_name_encodings = []
         images = os.listdir(path)
+        if not images:
+            return {'Name': 'Unknown'}
         for _ in images:
                 image = fr.load_image_file(path + _)
                 image_path = path + _
-                encoding = fr.face_encodings(image)[0]
+                encodings = fr.face_encodings(image)
+                if not encodings:
+                    continue
+                encoding = encodings[0]
                 known_name_encodings.append(encoding)
                 known_names.append(os.path.splitext(os.path.basename(image_path))[0].capitalize())
 
                 
        
+        if not known_name_encodings:
+            return {'Name': 'Unknown'}
+        name = 'Unknown'
         image = cv2.imread(test_image)
         
 
@@ -207,7 +224,7 @@ def RecognationBase64():
     
     pic =request.json['pic']
 
-    imgdata = base64.b64decode(pic)
+    imgdata = decode_image(pic)
     filename = image_path("Faces/Tests", f"{request.current_user.id}-capture.jpg")
 
     with open(filename, 'wb') as f:

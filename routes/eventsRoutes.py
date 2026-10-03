@@ -11,7 +11,11 @@ events_bp = Blueprint('events', __name__)
 emitter= EventEmitter.getInstance()
 
 @events_bp.post('/updateCurrentLocation')
+@token_required
 def post():
+    errors = NotificationSchema().validate(request.json)
+    if errors:
+        return errors, 422
     payload =NotificationSchema().load(request.json)
     notificationsRepository.create(payload)
     emitter.emit("updateCurrentLocation")

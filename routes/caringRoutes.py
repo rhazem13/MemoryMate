@@ -2,9 +2,9 @@ from flask import request, Blueprint
 from services.EventEmitter.event_emitter import EventEmitter
 from middlewares.auth import token_required
 from repositories.userRepository import UserRepository
-from middlewares.validation.userValidation import CreateUserscheme
+from middlewares.validation.userValidation import getuserscheme
 
-userScheme = CreateUserscheme(many=True)
+userScheme = getuserscheme(many=True)
 userRepository = UserRepository()
 caring_bp = Blueprint('caring', __name__)
 
@@ -13,5 +13,4 @@ caring_bp = Blueprint('caring', __name__)
 def get():
     # patient 
     result = userRepository.get_patients_by_caregiver_id(request.current_user.id)
-    print(result)
     return userScheme.dump(result)

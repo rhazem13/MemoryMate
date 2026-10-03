@@ -198,8 +198,7 @@ def reset():
             .create(to=phone_number, channel=channel)
         return jsonify({'message': 'sent successfully'})
     except TwilioRestException as e:
-        print(e)
-        return "Error validating code: {}".format(e)
+        return {'message': 'Verification provider unavailable'}, 502
 
 
 @user_bp.post('/verify')
@@ -237,7 +236,7 @@ def verify():
                 return {'message': verificationcode_error}
 
         except TwilioRestException as e:
-            return "Error validating code: {}".format(e)
+            return {'message': 'Verification provider unavailable'}, 502
 
     except KeyError as Ke:
         return {'message': "please send your correct "+str(Ke)}

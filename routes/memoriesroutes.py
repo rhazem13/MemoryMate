@@ -67,22 +67,24 @@ def post():
 @user_memories_bp.post('/caregiveradd/<memo_id>') #add caregivers 
 @token_required
 def addcaregiver(memo_id):
-        payload =request.json
-        memory=memoryRepository.get_by_id(memo_id)
-        caregivers=[]
-        try:
-         caregivers_ids=payload['caregivers_ids']
-         for caregiver_id in caregivers_ids:
-             cg=UserRepository().get_by_id(caregiver_id)
-             caregivers.append(cg)
-         (memory.caregivers).extend(caregivers)
-         resp = jsonify({'message' : 'caregivers added successfully'})
-         resp.status_code=200
-         db.session.commit()
-         return resp
-        except exc.SQLAlchemyError as err:
-            print(type(err))
-            return {'message' : 'failed to add caregivers'}
+    memory = memoryRepository.get_by_id(memo_id)
+    if memory is None:
+        abort(404)
+    caregiver_ids = request.json.get('caregivers_ids')
+    if not isinstance(caregiver_ids, list) or not all(type(id) is int for id in caregiver_ids):
+        abort(422)
+    from models.UserContacts.userContactsModel import UserContacts
+    from models.user.userModel import User
+    caregivers = User.query.join(UserContacts, User.id == UserContacts.contact_id).filter(
+        UserContacts.user_id == request.current_user.id,
+        User.id.in_(caregiver_ids), User.user_type == 'CAREGIVER').all()
+    if {user.id for user in caregivers} != set(caregiver_ids):
+        abort(403)
+    for caregiver in caregivers:
+        if caregiver not in memory.caregivers:
+            memory.caregivers.append(caregiver)
+    db.session.commit()
+    return {'message': 'Caregivers added'}
 
 
 # @user_memories_bp.get('/memoesget') #get all memories
@@ -96,7 +98,7 @@ def addcaregiver(memo_id):
 @token_required
 def geUsermemos():
     current_user = request.current_user
-    USERmemos = MemoryModel.query.filter_by(user_id=current_user.id).all()
+    USERmemos = memoryRepository.readable_query().all()
     if not USERmemos:
                 return jsonify({'message' : 'No memory found!'})
 
@@ -107,10 +109,10 @@ def geUsermemos():
 @token_required
 def getmemo(memo_id):
     current_user = request.current_user
-    memo = MemoryModel.query.filter_by(id=memo_id, user_id=current_user.id).first()
+    memo = memoryRepository.get_readable(memo_id)
     if not memo:
 
-         return {'message' : ' memory  not found for the current user!'}
+         abort(404)
 
     return memoryschema.dump(memo)
 
@@ -120,6 +122,8 @@ def getuser():
     current_user = request.current_user
 
     memo = MemoryModel.query.filter_by( user_id=current_user.id).first()
+    if memo is None:
+        abort(404)
     usr=memo.patient.photo_path
 
     return {"user photo is":usr}
@@ -134,9 +138,8 @@ def patch(memo_id):
         return errors, 422
     memo = MemoryModel.query.filter_by(id=memo_id, user_id=current_user.id).first()
     if not memo:
-         return {'message' : ' memory  not found for the current user!'}
+         abort(404)
     payload = MemorySchema().load(request.json,partial=True)
-    print(payload)
     result=memoryRepository.update(payload,memo_id)
     if not result:
         return "memory can't be updated",404
@@ -148,10 +151,8 @@ def delete(memo_id):
     current_user = request.current_user
     memo = MemoryModel.query.filter_by(id=memo_id, user_id=current_user.id).first()
     if not memo:
-        return {'message' : ' memory not found for the current user!'}
-    print(f"Deleting memory with id {memo.id}")
+        abort(404)
     result = memoryRepository.delete(memo.id)
-    print(f"Result: {result}")
     if(result):
         return jsonify({"the following memory id is deleted" :f"{memo.id}"}), 200
     else:
@@ -162,7 +163,12 @@ def delete(memo_id):
 @user_memories_bp.delete('/deletecaregiver/<memo_id>') #delete caregivers 
 @token_required
 def deletecaregiver(memo_id):
+        if memoryRepository.get_by_id(memo_id) is None:
+            abort(404)
         payload =request.json
+        ids = payload.get('caregivers_ids')
+        if not isinstance(ids, list) or not all(type(id) is int for id in ids):
+            abort(422)
         try:
          caregivers_ids=payload['caregivers_ids']
          for caregiver_id in caregivers_ids:
@@ -171,5 +177,4 @@ def deletecaregiver(memo_id):
          resp.status_code=200
          return resp
         except exc.SQLAlchemyError as err:
-            print(type(err))
             return jsonify({'message' : 'failed to delete caregivers'},403)

@@ -2,6 +2,8 @@ from config import required_env
 import cloudinary
 import cloudinary.uploader
 import os
+from io import BytesIO
+from utils.images import decode_image
 from dotenv import load_dotenv
 load_dotenv()
 class PhotoService:
@@ -15,5 +17,5 @@ class PhotoService:
         return PhotoService.photoService
 
     def addPhoto(self, photo,destFolder):
-        upload_result = cloudinary.uploader.upload(photo,folder=destFolder)
+        upload_result = cloudinary.uploader.upload(BytesIO(decode_image(photo)), folder=destFolder)
         return upload_result['secure_url']

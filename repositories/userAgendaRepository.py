@@ -1,5 +1,5 @@
 from models.UserAgenda.userAgendaModel import UserAgenda
-from repositories.repository import Repository
+from repositories.repository import Repository, current_user_id
 from sqlalchemy import func
 from sqlalchemy.dialects.postgresql import INTERVAL
 from sqlalchemy.sql.functions import concat
@@ -23,7 +23,7 @@ class UserAgendaRepository(Repository):
         db.session.commit()
     
     def updateAgendaStartTimeWithInterval(id):
-        UserAgenda.query.filter(UserAgenda.id == id).update({UserAgenda.start_time:UserAgenda.start_time+UserAgenda.repeat_interval})
+        UserAgenda.query.filter(UserAgenda.id == id, UserAgenda.user_id == current_user_id()).update({UserAgenda.start_time:UserAgenda.start_time+UserAgenda.repeat_interval})
         db.session.commit()
 
     

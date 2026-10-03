@@ -12,7 +12,7 @@ class LocationRepository(Repository):
         super().__init__(UserLocationModel)
 
     def get_all(self):
-        result = UserLocationModel.query.with_entities(UserLocationModel.additional_info, UserLocationModel.location_name, UserLocationModel.user_id,
+        result = self.owned_query().with_entities(UserLocationModel.additional_info, UserLocationModel.location_name, UserLocationModel.user_id,
                                                        func.ST_AsGeoJSON(func.ST_Envelope(UserLocationModel.geom)).label('geom')).all()
         return result
 
@@ -23,7 +23,6 @@ class LocationRepository(Repository):
                            func.ST_AsGeoJSON(func.ST_Envelope(UserLocationModel.geom)).label('geom'))\
             .filter(UserLocationModel.user_id == contact_id, UserContacts.user_id == user_id, UserContacts.contact_id == contact_id)\
             .all()
-        print(result)
         return result
 
     def get_waypointsOfPatient(self, user_id, contact_id):
@@ -36,7 +35,6 @@ class LocationRepository(Repository):
         return result
 
     def get_patients_location(self, id):
-        print('adasdasdasdasdasdsa')
         result = UserLocationModel.query.distinct(UserLocationModel.user_id)\
             .join(UserContacts, UserLocationModel.user_id == UserContacts.user_id)\
             .join(User, User.id == UserContacts.user_id)\
@@ -58,9 +56,3 @@ class LocationRepository(Repository):
             .all()
         return result
 
-    def create(self, value):
-        new_value = self.repoModel(**value)
-        db.session.add(new_value)
-        db.session.commit()
-        db.session.refresh(new_value)
-        return new_value

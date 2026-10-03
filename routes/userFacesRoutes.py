@@ -1,10 +1,12 @@
-from flask import jsonify, request, Blueprint
+from utils.images import save_face
+from utils.images import face_directory
+from pathlib import Path
+from flask import jsonify, request, Blueprint, send_file
 from flask_restful import abort
 from models.UserFaces.userfacesModel import UserfacesModel
 from repositories.userFacesRepository import UserfacesRepository
 from middlewares.validation.userFacesValidation import UserFacesSchema
 from middlewares.auth import token_required
-from routes.userRoutes import allowed_file
 from werkzeug.utils import secure_filename
 import os
 import base64
@@ -17,20 +19,6 @@ user_face_bp = Blueprint('userface', __name__)
 manySchema=UserFacesSchema(many=True)
 singleSchema=UserFacesSchema()
 facesRepository= UserfacesRepository()
-
-# testing the photo upload service
-@user_face_bp.post('/test')
-def postz():
-    result = request.json
-    return {"result": photoService.addPhoto(result['photo'],result['folder'])}
-
-@user_face_bp.get('/test/<int:id>')
-def getz(id):
-    photoService.addPhoto()
-    return {"result": photoService.getPhoto(id)}
-
-#######################################
-
 
 @user_face_bp.post('')
 @token_required
@@ -55,22 +43,7 @@ def post():
         resp.status_code=400
         return resp
 
-    pic =request.json['face_url']
-  
-
-
-    starter = pic.find(',')
-    image_data = pic[starter+1:]
-    image_data = bytes(image_data, encoding="ascii")
-    im = Image.open(BytesIO(base64.b64decode(image_data)))
-        
-
-    img_path =  f"static/faces/Images/{name}.jpg" 
-
-    im.save(img_path)
-
-
-    payload['face_url']=img_path 
+    payload['face_url'] = save_face(request.json['face_url'])
 
     payload['user_id'] = user_id
 
@@ -101,6 +74,10 @@ def patch(id):
     if errors:
         return errors, 422
     payload =UserFacesSchema().load(request.get_json(),partial=True)
+    if facesRepository.get_by_id(id) is None:
+        abort(404)
+    if 'face_url' in payload:
+        payload['face_url'] = save_face(payload['face_url'])
     result=facesRepository.update(payload,id)
     if not result:
         return "Location Id doesn't exist",404
@@ -113,3 +90,15 @@ def delete(id):
     if(result):
         return {"deleted":f"{id}"}
     abort(404)
+
+
+@user_face_bp.get('/<int:id>/image')
+@token_required
+def image(id):
+    face = facesRepository.get_by_id(id)
+    if face is None:
+        abort(404)
+    path = (face_directory() / face.face_url).resolve()
+    if not path.is_relative_to(face_directory().resolve()) or not path.is_file():
+        abort(404)
+    return send_file(path)

@@ -31,12 +31,16 @@ def post():
 
 
 @user_location_bp.patch('/<int:id>')
-# @token_required
+@token_required
 def patch(id):
     errors = singleSchema.validate(request.get_json(), partial=True)
     if errors:
         return errors, 422
     payload = UserLocationSchema().load(request.get_json(), partial=True)
+    if 'lat' in payload or 'lng' in payload:
+        if 'lat' not in payload or 'lng' not in payload:
+            return {'message': 'Both lat and lng are required'}, 422
+        payload['geom'] = f"POINT({payload.pop('lng')} {payload.pop('lat')})"
     result = locationRepository.update(payload, id)
     if not result:
         return "Location Id doesn't exist", 404
@@ -44,7 +48,7 @@ def patch(id):
 
 
 @user_location_bp.delete('/<int:id>')
-# @token_required
+@token_required
 def delete(id):
     result = locationRepository.delete(id)
     if(result):
@@ -61,7 +65,6 @@ def get_waypoints():
     else:
         result = locationRepository.get_patients_location(id)
     result_arr = []
-    print(result)
     for row in result:
         new_row = {"bio": row.bio, "full_name": row.full_name,
                    "user_id": row.user_id}
@@ -72,7 +75,7 @@ def get_waypoints():
     return manySchema.dump(result_arr)
 
 
-@user_location_bp.get("<int:id>")
+@user_location_bp.get("/<int:id>")
 @token_required
 def getUserLocation(id):
     current_user = request.current_user
@@ -80,6 +83,8 @@ def getUserLocation(id):
         result = locationRepository.get_waypointsOfCaregiver(current_user.id, id)
     else:
         result = locationRepository.get_waypointsOfPatient(id, current_user.id)
+    if not result:
+        abort(404)
     json_geom = json.loads(result[0].geom)['coordinates']
     new_result = {"bio":result[0].bio, "full_name":result[0].full_name, "lat":json_geom[0], "lng":json_geom[1]}
     return singleSchema.dump(new_result)

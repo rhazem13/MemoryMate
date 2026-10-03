@@ -25,6 +25,10 @@ def token_required(f):
         except (jwt.InvalidTokenError, KeyError):
             return jsonify({'message': 'you are not supposed to be here!'}), 401
 
+        if request.method in {'POST', 'PATCH', 'PUT', 'DELETE'} and request.is_json:
+            if not isinstance(request.get_json(silent=True), dict):
+                return jsonify({'message': 'A JSON object is required'}), 422
+
         return f(*args, **kwargs)
 
     return decorated

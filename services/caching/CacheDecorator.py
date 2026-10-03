@@ -1,8 +1,8 @@
 from flask_caching import Cache
 from functools import wraps
 class CacheDecorator(Cache):
-    def __init__(self, app = None, with_jinja2_ext = True, config=None) -> None:
-        super().__init__(app, with_jinja2_ext, config)
+    def __init__(self, app=None, config=None) -> None:
+        super().__init__(app, config=config)
 
     def get_cache(self, key_prefix):
         def inner_decorator (f):

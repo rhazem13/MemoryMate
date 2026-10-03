@@ -14,6 +14,8 @@ from models.UserContacts.userContactsModel import UserContacts
 from models.UserFaces.userfacesModel import UserfacesModel
 from models.user.userTypeEnum import EUserType
 from repositories.repository import Repository
+from repositories.repository import current_user_id
+from flask import abort
 from repositories.contactsRepository import ContactsRepository
 from sqlalchemy.orm import load_only
 from sqlalchemy import func
@@ -26,64 +28,57 @@ class UserRepository(Repository):
    def __init__(self):
          super().__init__(User)
 
-   def get_all(self):
-      result = User.query.with_entities(User.username,User.firstname,User.lastname,User.user_type,User.address,User.phone,
-      User.password,User.date_of_birth,User.email,
-      func.ST_AsGeoJSON(func.ST_Envelope(User.location)).label('location')).all()
-      return result
-
-   def get_close_friends_locations(self,id):
-      user = User.query.get(id)
-      contactslist = UserContacts.query.filter(UserContacts.user_id==id).with_entities(UserContacts.contact_id).all()
-      newlist = [sublist[0] for sublist in contactslist]
-      print(2 in newlist)
-      result = User.query.with_entities(User.username,User.firstname,User.lastname,User.user_type,User.address,User.phone,
-      User.password,User.date_of_birth,User.email,
-      func.ST_AsGeoJSON(func.ST_Envelope(User.location)).label('location')).filter(User.id.in_(newlist)).order_by(User.location.distance_box(user.location)).limit(10).all()
-      print(result)
-      return result
+   def get_close_friends_locations(self, id):
+      if int(id) != current_user_id():
+         abort(404)
+      from repositories.locationRepository import LocationRepository
+      return LocationRepository().get_caregivers_location(id)
 
    def get_by_email(self,email):
       result = User.query.filter_by(email = email).first()
       return result
    def get_by_id(self,id):
       result = User.query.get(id)
-      print(str(vars(result)))
       return result
+
+   def create(self, data):
+      allowed = {'full_name', 'email', 'password', 'photo_path', 'user_type',
+                 'address', 'phone', 'date_of_birth'}
+      if not set(data).issubset(allowed):
+         abort(422)
+      user = User(**data)
+      db.session.add(user)
+      db.session.commit()
+      return user
    
    def patch(self,id,data):
-      user = User.query.get(id)
+      if int(id) != current_user_id():
+         abort(404)
+      allowed = {'full_name', 'address', 'phone', 'date_of_birth'}
+      if not set(data).issubset(allowed):
+         abort(422)
+      user = db.session.get(User, id)
       for key, value in data.items():
          setattr(user, key, value)
       db.session.commit()
       return user
 
    def changephoto(self,id,newphoto):
+      if int(id) != current_user_id():
+         abort(404)
       user = User.query.get(id)
       newphotopath = photoservice.addPhoto(newphoto,"users")
       setattr(user, "photo_path", newphotopath)
       db.session.commit()
       return user
 
-   def get_attr(id, attr):
-      users = session.query(SomeModel).options(load_only(*fields)).all()
-   
    def get_patients_by_caregiver_id(self, id):
-      result = contactsRepository.get_patients_ids(id)
-      idlist = [sublist[0] for sublist in result]
-      patients = User.query.with_entities(User.username,User.firstname,User.lastname,User.user_type,User.address,User.phone,
-      User.password,User.date_of_birth,User.email,
-      func.ST_AsGeoJSON(func.ST_Envelope(User.location)).label('location')).filter(User.id.in_(idlist)).all()
-      return patients
+      if int(id) != current_user_id():
+         abort(404)
+      return User.query.join(UserContacts, UserContacts.user_id == User.id).filter(
+         UserContacts.contact_id == id).all()
 
+   @staticmethod
    def get_caregivers_by_patient_id(patient_id):
-      contacts = ContactsRepository.findByUserId(patient_id)
-      if contacts is None:
-         return
-      print('contacts are ',contacts, patient_id)
-      ids = list()
-      for contact in contacts:
-         ids.append(contact.contact_id)
-      result = User.query.filter(User.id.in_(ids)).all()
-      return result 
-
+      return User.query.join(UserContacts, UserContacts.contact_id == User.id).filter(
+         UserContacts.user_id == patient_id).all()
