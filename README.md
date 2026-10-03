@@ -12,14 +12,16 @@ A team project exploring memory aids, caregiver reminders, contacts, and locatio
 
 This is a historical prototype, not a healthcare production system. The face-recognition and image-classification experiments have separate native/ML dependencies and are not medical diagnostic tools.
 
-## Local setup
+## Historical application setup
+
+The full dependency manifest is retained as a record of the original prototype, not a supported deployment environment. A 2026-10-03 audit reported 164 advisories across 20 pinned packages, including the legacy ML chain. Do not deploy that manifest. The reproducible verification path is the focused backend environment below; its separate dependency audit reported no known findings on that date. That result does not validate ML inference or provider security.
 
 Use a Python 3.10 virtual environment, PostgreSQL with PostGIS, and Redis:
 
 ```sh
 python -m venv .venv
 # Activate .venv for your operating system.
-python -m pip install -r requirements.txt
+# The historical full manifest requires dependency migration before use.
 # Copy .env.example to .env and configure your own services.
 flask --app app db upgrade
 flask --app app run
