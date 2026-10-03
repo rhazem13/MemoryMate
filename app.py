@@ -1,8 +1,10 @@
+from dotenv import load_dotenv
+load_dotenv()
+from config import Config
 from flask import Flask, request, jsonify, make_response, session
 from flask_restful import Api
 from flask_migrate import Migrate
 from services.caching.caching import CacheService
-from dotenv import load_dotenv
 from models.db import db
 from middlewares.SocketAuth import *
 from routes.userRoutes import user_bp
@@ -38,7 +40,7 @@ app = Flask(__name__)
 CORS(app, resources={r'/*': {'origins': '*'}})
 
 api = Api(app)
-app.config.from_object('config.Config')
+app.config.from_object(Config)
 migrate = Migrate(app, db)
 migrate.init_app(app, db)
 ma = Marshmallow(app)
@@ -116,6 +118,6 @@ if __name__ == '__main__':
         redis_client.delete(f"agenda-{agenda_id}")
         UserAgendaRepository.updateAgendaStartTimeWithInterval(
             data['agenda_id'])
-    app.run(host="0.0.0.0", debug=True, use_reloader=False)
+    app.run(host="0.0.0.0", debug=False, use_reloader=False)
 print('starting socket')
 #socketio.run(app, debug = True, host='127.0.0.1')

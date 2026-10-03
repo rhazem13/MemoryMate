@@ -1,3 +1,4 @@
+from utils.auth_tokens import encode_token
 from flask import Flask, request, Blueprint, jsonify, make_response, session
 from flask_restful import Resource, reqparse, abort
 from flask_bcrypt import generate_password_hash, check_password_hash
@@ -6,7 +7,6 @@ from repositories.userRepository import UserRepository
 from middlewares.validation.userValidation import *
 from repositories.userRepository import UserRepository
 from middlewares.auth import *
-import jwt
 import datetime
 import time
 import random
@@ -18,6 +18,7 @@ from twilio.rest import Client
 from twilio.base.exceptions import TwilioRestException
 from models.db import db
 from dotenv import load_dotenv
+from config import required_env
 from services.caching.caching import CacheService
 from services.EventEmitter.event_emitter import EventEmitter
 from middlewares.auth import token_required
@@ -44,9 +45,9 @@ LOG = logging.getLogger('alerta.plugins.twilio')
 
 userRepository = UserRepository()
 Folder_Name = "user photo"
-TWILIO_ACCOUNT_SID = os.environ.get('TWILIO_ACCOUNT_SID')
-TWILIO_AUTH_TOKEN = os.environ.get('TWILIO_AUTH_TOKEN')
-VERIFY_SERVICE_SID = os.environ.get('VERIFY_SERVICE_SID')
+TWILIO_ACCOUNT_SID = required_env('TWILIO_ACCOUNT_SID')
+TWILIO_AUTH_TOKEN = required_env('TWILIO_AUTH_TOKEN')
+VERIFY_SERVICE_SID = required_env('VERIFY_SERVICE_SID')
 
 
 client = Client(TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN)
@@ -114,7 +115,7 @@ def register():
      userRepository.create(payload)
      # create token
      user = userRepository.get_by_email(payload['email'])
-     token = jwt.encode({'id': user.id}, os.environ['JWT_SECRET_KEY'])
+     token = encode_token({'id': user.id})
      return {'token': token}
     #  return jsonify({'message': 'registered successfully'})
     except IntegrityError :
@@ -134,7 +135,7 @@ def login():
     if check_password_hash(user.password, payload['password']):
         try:
             # , 'exp' : datetime.datetime.utcnow() + datetime.timedelta(minutes=30)
-            token = jwt.encode({'id': user.id}, os.environ['JWT_SECRET_KEY'])
+            token = encode_token({'id': user.id})
             return {'token': token}
         except ValidationError as err:
             print(err.messages)
@@ -228,7 +229,7 @@ def verify():
 
             if check.status == 'approved':
                 # , 'exp' : datetime.datetime.utcnow() + datetime.timedelta()
-                token = jwt.encode({'id': user.id}, os.environ['JWT_SECRET_KEY'])
+                token = encode_token({'id': user.id})
                 return jsonify({'token': token})
 
             else:

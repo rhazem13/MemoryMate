@@ -1,6 +1,5 @@
+from utils.auth_tokens import decode_token
 import os
-from models.user.userModel import User
-from repositories.userRepository import UserRepository
 from models.user.userModel import User
 from flask import request, jsonify
 from functools import wraps
@@ -16,14 +15,14 @@ def token_required(f):
             token = request.headers['x-access-token']
 
         if not token:
-            print('not token')
             return jsonify({'message': 'Token is missing!'}), 401
 
         try:
-            data = jwt.decode(token, os.environ['JWT_SECRET_KEY'], algorithms=['HS256'])
+            data = decode_token(token)
             request.current_user = User.query.filter_by(id=data['id']).first()
-        except Exception as e:
-            print(e)
+            if request.current_user is None:
+                return jsonify({'message': 'Invalid token'}), 401
+        except (jwt.InvalidTokenError, KeyError):
             return jsonify({'message': 'you are not supposed to be here!'}), 401
 
         return f(*args, **kwargs)

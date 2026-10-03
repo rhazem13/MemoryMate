@@ -10,3 +10,16 @@ __pycache__/
 *.jpg
 *.png
 node_modules
+
+# Local configuration and private user media
+.env
+.env.*
+!.env.example
+.venv/
+.idea/
+Faces/Tests/
+MachineLearning/Face_Recognation/train/
+*.JPG
+*.jpeg
+*.whl
+.serena/
