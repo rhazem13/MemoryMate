@@ -7,12 +7,12 @@ from models.db import db
 class UserAgendaRepository(Repository):
     def __init__(self):
         super().__init__(UserAgenda)
-    
+
     def findWithenInterval(interval):
         result = UserAgenda.query.filter((func.date_trunc('minute',UserAgenda.start_time+UserAgenda.repeat_interval)>=func.date_trunc('minute',func.now()))&(
         func.date_trunc('minute', UserAgenda.start_time+UserAgenda.repeat_interval)<=func.date_trunc('minute',func.now()+func.cast(concat(interval, 'MINUTES'), INTERVAL)))).all()
         return result
-    
+
     def getExpiredAgenda():
         result = UserAgenda.query.filter(UserAgenda.start_time<func.now()).all()
         return result
@@ -21,9 +21,7 @@ class UserAgendaRepository(Repository):
         print('in update function ')
         UserAgenda.query.filter(UserAgenda.start_time<func.now()).update({UserAgenda.start_time:UserAgenda.start_time+UserAgenda.repeat_interval})
         db.session.commit()
-    
+
     def updateAgendaStartTimeWithInterval(id):
         UserAgenda.query.filter(UserAgenda.id == id, UserAgenda.user_id == current_user_id()).update({UserAgenda.start_time:UserAgenda.start_time+UserAgenda.repeat_interval})
         db.session.commit()
-
-    

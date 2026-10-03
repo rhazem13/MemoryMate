@@ -55,4 +55,3 @@ class LocationRepository(Repository):
             .order_by(UserLocationModel.user_id, UserLocationModel.id.desc())\
             .all()
         return result
-

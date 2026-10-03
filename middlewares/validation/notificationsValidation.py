@@ -13,4 +13,3 @@ class NotificationSchema(Schema):
     body = fields.Nested(NotificationBodySchema)
     created_at = fields.DateTime(required=True)
     type = fields.String(required=False)
-

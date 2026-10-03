@@ -15,6 +15,7 @@ class Config:
 
     SQLALCHEMY_DATABASE_URI = required_env('DB_URL')
     SQLALCHEMY_TRACK_MODIFICATIONS = False
+    MAX_CONTENT_LENGTH = 8 * 1024 * 1024
     CACHE_TYPE = os.getenv('CACHE_TYPE', 'RedisCache')
     CACHE_REDIS_HOST = os.getenv('CACHE_REDIS_HOST', 'localhost')
     CACHE_REDIS_PORT = int(os.getenv('CACHE_REDIS_PORT', '6379'))

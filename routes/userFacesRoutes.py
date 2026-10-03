@@ -98,6 +98,8 @@ def image(id):
     face = facesRepository.get_by_id(id)
     if face is None:
         abort(404)
+    if not isinstance(face.face_url, str):
+        abort(404)
     path = (face_directory() / face.face_url).resolve()
     if not path.is_relative_to(face_directory().resolve()) or not path.is_file():
         abort(404)

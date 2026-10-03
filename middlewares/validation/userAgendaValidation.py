@@ -9,4 +9,3 @@ class UserAgendaSchema(Schema):
     start_time = fields.DateTime(required=True)
     user_id = fields.Int(dump_only=True)
     repeat_interval = fields.TimeDelta(required=True)
-
