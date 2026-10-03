@@ -39,3 +39,17 @@ def save_face(value):
     with Image.open(BytesIO(data)) as image:
         image.convert('RGB').save(path, format='JPEG')
     return path.name
+
+
+def remove_face(filename):
+    if isinstance(filename, str) and Path(filename).name == filename:
+        (face_directory() / filename).unlink(missing_ok=True)
+
+
+def known_faces():
+    from models.UserFaces.userfacesModel import UserfacesModel
+    faces = UserfacesModel.query.filter_by(user_id=current_user_id()).all()
+    directory = face_directory()
+    return [(face.name, str(directory / face.face_url)) for face in faces
+            if isinstance(face.face_url, str) and Path(face.face_url).name == face.face_url
+            and (directory / face.face_url).is_file()]

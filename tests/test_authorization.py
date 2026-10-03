@@ -37,7 +37,7 @@ from models.Memories.userMemoriesModel import MemoryModel
 from models.Memories.memoryPicsModel import MemoPictures
 from repositories.userRepository import UserRepository
 from utils.auth_tokens import encode_token
-from utils.images import decode_image, save_face
+from utils.images import decode_image, known_faces
 from routes.userCalendarRoutes import user_calendar_bp
 from routes.userAgendaRoutes import user_agenda_bp
 from routes.notificationRoutes import notification_bp
@@ -217,6 +217,32 @@ def test_private_media_and_removed_debug_routes(app):
     assert client.get(path, headers=headers(2)).status_code == 404
     assert client.get(path, headers=headers(1)).status_code == 200
     assert client.get('/userfaces', headers=headers(1)).json[0]['face_url'] == path
+    with app.test_request_context():
+        from flask import request
+        request.current_user = db.session.get(User, 1)
+        assert known_faces()[0][0] == '../../escape'
+        request.current_user = db.session.get(User, 2)
+        assert known_faces() == []
+    old_filename = face.face_url
+    directory = Path(app.instance_path) / 'faces' / '1'
+    assert client.patch(f'/userfaces/{face.id}', headers=headers(2), json={'face_url': png()}).status_code == 404
+    assert len(list(directory.iterdir())) == 1
+    assert client.patch(f'/userfaces/{face.id}', headers=headers(1), json={'face_url': png()}).status_code == 200
+    assert not (directory / old_filename).exists()
+    assert len(list(directory.iterdir())) == 1
+    assert client.delete(f'/userfaces/{face.id}', headers=headers(1)).status_code == 200
+    assert list(directory.iterdir()) == []
+
+
+def test_failed_face_persistence_removes_new_file(app):
+    from sqlalchemy.exc import IntegrityError
+    db.session.execute(text("ALTER TABLE userfaces ADD CONSTRAINT reject_test_face CHECK (name <> 'reject')"))
+    db.session.commit()
+    client = app.test_client()
+    with pytest.raises(IntegrityError):
+        client.post('/userfaces', headers=headers(1), json={'name': 'reject', 'bio': 'Test', 'face_url': png()})
+    assert list((Path(app.instance_path) / 'faces' / '1').iterdir()) == []
+    assert UserfacesModel.query.count() == 0
 
 
 @pytest.mark.parametrize('value', ['file:///etc/passwd', 'https://example.invalid/image.png', '/private/file.jpg', 'not-base64'])
@@ -273,6 +299,8 @@ def test_location_and_contact_sharing_require_relationship(app):
     db.session.add(UserContacts(user_id=1, contact_id=3, relation='close', bio='Test'))
     db.session.commit()
     assert client.get('/userlocation/1', headers=headers(3)).status_code == 200
+    assert client.get('/userlocation/1', headers=headers(3)).json['lat'] == 30
+    assert client.get('/userlocation/1', headers=headers(3)).json['lng'] == 31
     assert client.get('/userlocation/1', headers=headers(2)).status_code == 404
     assert client.get('/usercontacts/caregivers', headers=headers(2)).json == []
     assert len(client.get('/usercontacts/caregivers', headers=headers(1)).json) == 1

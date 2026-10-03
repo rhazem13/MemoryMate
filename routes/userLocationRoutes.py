@@ -70,8 +70,8 @@ def get_waypoints():
                    "user_id": row.user_id}
         result_arr.append(new_row)
         json_geom = json.loads(row.geom)['coordinates']
-        new_row['lat'] = json_geom[0]
-        new_row['lng'] = json_geom[1]
+        new_row['lat'] = json_geom[1]
+        new_row['lng'] = json_geom[0]
     return manySchema.dump(result_arr)
 
 
@@ -86,5 +86,5 @@ def getUserLocation(id):
     if not result:
         abort(404)
     json_geom = json.loads(result[0].geom)['coordinates']
-    new_result = {"bio":result[0].bio, "full_name":result[0].full_name, "lat":json_geom[0], "lng":json_geom[1]}
+    new_result = {"bio":result[0].bio, "full_name":result[0].full_name, "lat":json_geom[1], "lng":json_geom[0]}
     return singleSchema.dump(new_result)

@@ -177,4 +177,5 @@ def deletecaregiver(memo_id):
          resp.status_code=200
          return resp
         except exc.SQLAlchemyError as err:
-            return jsonify({'message' : 'failed to delete caregivers'},403)
+            db.session.rollback()
+            return jsonify({'message': 'Failed to delete caregivers'}), 500

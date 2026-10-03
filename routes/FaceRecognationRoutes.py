@@ -1,4 +1,4 @@
-from utils.images import face_directory, decode_image
+from utils.images import face_directory, decode_image, known_faces
 from utils.uploads import image_path
 import os
 import face_recognition as fr
@@ -76,18 +76,17 @@ def Recognation():
 
         known_names = []
         known_name_encodings = []
-        images = os.listdir(path)
+        images = known_faces()
         if not images:
             return {'Name': 'Unknown'}
-        for _ in images:
-                image = fr.load_image_file(path + _)
-                image_path = path + _
+        for face_name, image_path in images:
+                image = fr.load_image_file(image_path)
                 encodings = fr.face_encodings(image)
                 if not encodings:
                     continue
                 encoding = encodings[0]
                 known_name_encodings.append(encoding)
-                known_names.append(os.path.splitext(os.path.basename(image_path))[0].capitalize())
+                known_names.append(face_name)
 
                 
        
@@ -151,18 +150,17 @@ def RecognationBase64():
 
         known_names = []
         known_name_encodings = []
-        images = os.listdir(path)
+        images = known_faces()
         if not images:
             return {'Name': 'Unknown'}
-        for _ in images:
-                image = fr.load_image_file(path + _)
-                image_path = path + _
+        for face_name, image_path in images:
+                image = fr.load_image_file(image_path)
                 encodings = fr.face_encodings(image)
                 if not encodings:
                     continue
                 encoding = encodings[0]
                 known_name_encodings.append(encoding)
-                known_names.append(os.path.splitext(os.path.basename(image_path))[0].capitalize())
+                known_names.append(face_name)
 
                 
        
